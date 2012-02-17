@@ -7,10 +7,24 @@ html, body {
     width: 100%;
 }
 
+#container {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    position: absolute;
+    top:0px;
+    bottom:0px;
+    right:0px;
+    left:0px;
+}
+
+#topbar {
+    height: 54px;
+    background-color: Black;
+    display: -webkit-box;
+    -webkit-box-orient: horizontal;
+}
+
+
 #map {
-	position: absolute;
-	top: 0px;
-	bottom: 0px;
-	left: 0px;
-	right: 0px;
+    -webkit-box-flex: 1;
 }

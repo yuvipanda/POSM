@@ -3,20 +3,29 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>PhoneGap</title>
+
+<!-- Le styles -->
+<link href="css/bootstrap.css" rel="stylesheet">
+<link href="css/bootstrap-responsive.css" rel="stylesheet">
 <link rel="stylesheet" href="style.css" />
 
 <script src="lib/jquery-1.7.1.min.js"></script>
+
 <script type="text/javascript" charset="utf-8" src="lib/phonegap.js"></script>
 
 <link rel="stylesheet" href="lib/leaflet/leaflet.css" />
-<!--[if lte IE 8]><link rel="stylesheet" href="lib/leaflet/leaflet.ie.css" /><![endif]-->
 
 <script src="lib/leaflet/leaflet.js"></script>
 <script src="js/main.js"></script>
 
 </head>
 <body onLoad="onBodyLoad();">
-    <div id="map">
+    <div id="container">
+        <div id="topbar">
+            <button id="show-poi" class="btn">Show POIs</button>
+        </div>
+        <div id="map">
+        </div>
     </div>
 </body>
 </html>

@@ -3,8 +3,10 @@ function onBodyLoad() {
 	document.addEventListener("deviceready", function() { init(); }, true);
 }
 
+var map = null;
+
 function init() {
-    var map = new L.Map('map');
+    map = new L.Map('map');
 
     var tiles = new L.TileLayer('http://otile{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {
         maxZoom: 18,
@@ -19,3 +21,46 @@ function init() {
         console.log("Location found");
     });
 }
+
+$(function() {
+    $("#show-poi").click(function() {
+        var bounds = map.getBounds();
+        var sw = bounds.getSouthWest();
+        var nw = bounds.getNorthEast();
+        var boundsString = "(" + sw.lat + "," + sw.lng + "," + nw.lat + "," + nw.lng + ")";
+        console.log(boundsString);
+        $.ajax({
+            url: "http://overpass.osm.rambler.ru/cgi/interpreter", 
+            data: {
+                data: "[out:json];node" + boundsString + ";out body;"
+            },
+            dataType: "text",
+            success: function(resp) {
+                // Stupid bug in their API produces invalid JSON
+                // Emailed them about it, told me a fix is coming
+                // Till then
+                resp = resp.replace(/\\:/g, ':');
+                var data = JSON.parse(resp);
+                var elements = data.elements;
+                var pois = elements.filter(function(element) {
+                    if(element.tags) {
+                        delete element.tags.source;
+                        if($.isEmptyObject(element.tags)) {
+                            delete element.tags;
+                        }
+                    }
+                    return element.tags;
+                });
+                $.each(pois, function(i, poi) {
+                    var marker = new L.Marker(new L.LatLng(poi.lat, poi.lon));
+                    marker.bindPopup("<strong>" + poi.tags.name + "</strong>");
+                    map.addLayer(marker);
+                });
+            },
+            error: function(err) {
+                console.log("WAH WAH");
+                console.log(JSON.parse(err.responseText));
+            }
+        });
+    });
+});
