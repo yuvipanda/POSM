@@ -9,8 +9,13 @@ function onBodyLoad() {
     }
 }
 
+document.addEventListener("mobileinit", function() {
+    $.mobile.page.prototype.options.backBtnText = "";
+}, true);
+
 var map = null;
 var shownNodeIDs = [];
+var deleteTags = ['^source$', '^created_by$', '^AND_'];
 
 function resizeContentArea() {
     var content, contentHeight, footer, header, viewportHeight;
@@ -46,20 +51,25 @@ function init() {
 function convertForDisplay(poi) {
     var tags = [];
     $.each(poi.tags, function(key, value) {
-        tags.push({'key': key, 'value': value});
+        if(key != 'name') {
+            tags.push({'key': key, 'value': value});
+        }
     });
     return {
         id: poi.id,
         lat: poi.lat,
         lon: poi.lon,
+        name: poi.tags.name,
         tags: tags
     };
 }
 
 function showPOI(poi) {
     var template = templates.getTemplate("poi-template");
-    $("#poi-content").empty().html(template.render(convertForDisplay(poi))).trigger('create');
+    $("#poi-content").empty().html(template.render(convertForDisplay(poi)));
+    $("#poi-name").html(poi.tags.name || 'No name');
     $.mobile.changePage('#poi-page');
+    $("#poi-page").trigger("create");
 }
 
 $(function() {
@@ -88,8 +98,18 @@ $(function() {
                 var elements = data.elements;
                 var pois = elements.filter(function(element) {
                     if(element.tags) {
-                        delete element.tags.source;
-                        delete element.tags.created_by;
+                        var to_delete = [];
+                        $.each(element.tags, function(key, value) {
+                            $.each(deleteTags, function(i, regex) {
+                                if(key.match(new RegExp(regex))) {
+                                    to_delete.push(key);
+                                }
+                            });
+                        });
+
+                        $.each(to_delete, function(i, key) {
+                            delete element.tags[key];
+                        });
                         if($.isEmptyObject(element.tags)) {
                             delete element.tags;
                         }
@@ -118,5 +138,17 @@ $(function() {
                 console.log(JSON.parse(err.responseText));
             }
         });
+    });
+
+    $("#login").click(function() {
+        $("#login-user-id").val(localStorage.userName);
+        // Death by electrocution and a thousand hours of using PHP 3
+        $("#login-password").val(localStorage.password);
+        $.mobile.changePage("#login-dialog");
+    });
+    $("#save-login").click(function() {
+        localStorage.userName = $("#login-user-id").val();
+        localStorage.password = $("#login-password").val();
+        history.back();
     });
 });

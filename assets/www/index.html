@@ -21,38 +21,38 @@
 <script src="js/main.js"></script>
 
 <script type="text/html" id="poi-template">
-    <form>
-        <div data-role="fieldcontain">
-            <label for="poi-id">ID</label>
-            <input type="text" name="poi-id" id="poi-id" value="{{id}}" readonly />
+    <div>
+        <div class="ui-grid-a">
+            <small class="ui-block-a" style="width: 35%">#{{id}}</small>
+            <small class="ui-block-b" style="width: 65%; text-align: right">({{lat}}, {{lon}})</small>
         </div>
-
-        <div data-role="fieldcontain">
-            <label for="latitude">Latitude</label>
-            <input type="text" name="poi-lat" id="poi-lat" value="{{lat}}" />
+        {{#name}}
+        <div>
+            <big>{{name}}</big>
         </div>
-
-
-        <div data-role="fieldcontain">
-            <label for="id">Longitude</label>
-            <input type="text" name="poi-lon" id="poi-lon" value="{{lon}}" />
-        </div>
-
+        {{/name}}
+        <ul data-role="listview" data-inset="true" id="poi-tags-list">
         {{#tags}}
-        <div data-role="fieldcontain">
-            <label for="poi-tag-{{key}}">{{key}}</label>
-            <input type="text" name="poi-lon" id="poi-lon" value="{{value}}" />
-        </div>
+            <li>
+                {{key}}: {{value}}
+            </li>
         {{/tags}}
-    </form>
+        {{^tags}}
+            <li>No tags added</li>
+        {{/tags}}
+        </ul>
+    </div>
 </script>
 
 </head>
 <body onLoad="onBodyLoad();">
     <div data-role="page" id="map-page">
-        <div data-role="header" id="map-header" >
-            <button id="show-poi" class="btn">Show POIs</button>
-            <button id="current-location" class="btn">Current Location</button>
+        <div data-role="header" id="map-header">
+            <div data-role="controlgroup" data-type="horizontal">
+                <a href="#" id="show-poi" data-role="button">Show POIs</a>
+                <a href="#" id="current-location" data-role="button">Current Location</a>
+                <a href="#" id="login" data-rel="dialog" data-role="button">Login</a>
+            </div>
         </div>
         <div id="map-container" data-role="content">
             <div id="map">
@@ -63,13 +63,35 @@
         </div>
     </div>
 
-    <div data-role="page" id="poi-page">
+    <div data-role="page" id="poi-page" data-add-back-btn="true">
         <div data-role="header" id="poi-header">
+            <h1 id="poi-name"></h1>
         </div>
         <div data-role="content" id="poi-content">
         </div>
         <div data-role="footer" id="poi-footer">
         </div>
     </div>
+
+    <div data-role="dialog" id="login-dialog">
+        <div data-role="header" id="login-header">
+            <h2>OSM Login</h2>
+        </div>
+        <div data-role="content" id="login-content">
+            <div data-role="fieldcontain">
+                <label for="login-user-id">Username</label>
+                <input type="text" name="login-user-id" id="login-user-id" />
+            </div>
+
+            <div data-role="fieldcontain">
+                <label for="login-user-password">Password</label>
+                <input type="password" name="login-user-password" id="login-password"  />
+            </div>
+        </div>
+        <div data-role="footer" id="login-footer">
+            <button id="save-login">Save</button>
+        </div>
+    </div>
+
 </body>
 </html>
