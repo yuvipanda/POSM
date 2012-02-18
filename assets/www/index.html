@@ -4,27 +4,70 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>PhoneGap</title>
 
-<!-- Le styles -->
-<link href="css/bootstrap.css" rel="stylesheet">
-<link href="css/bootstrap-responsive.css" rel="stylesheet">
-<link rel="stylesheet" href="style.css" />
+<script type="text/javascript" charset="utf-8" src="lib/phonegap.js"></script>
+
+<link rel="stylesheet" href="lib/jquery.mobile-1.0.1.css" />
+<link rel="stylesheet" href="lib/jquery.mobile.structure-1.0.1.css" />
 
 <script src="lib/jquery-1.7.1.min.js"></script>
-
-<script type="text/javascript" charset="utf-8" src="lib/phonegap.js"></script>
+<script src="lib/jquery.mobile-1.0.1.js"></script>
+<script src="lib/hogan.min.js"></script>
+<script src="lib/templates.js"></script>
 
 <link rel="stylesheet" href="lib/leaflet/leaflet.css" />
 
+<link rel="stylesheet" href="style.css" />
 <script src="lib/leaflet/leaflet.js"></script>
 <script src="js/main.js"></script>
 
+<script type="text/html" id="poi-template">
+    <form>
+        <div data-role="fieldcontain">
+            <label for="poi-id">ID</label>
+            <input type="text" name="poi-id" id="poi-id" value="{{id}}" readonly />
+        </div>
+
+        <div data-role="fieldcontain">
+            <label for="latitude">Latitude</label>
+            <input type="text" name="poi-lat" id="poi-lat" value="{{lat}}" />
+        </div>
+
+
+        <div data-role="fieldcontain">
+            <label for="id">Longitude</label>
+            <input type="text" name="poi-lon" id="poi-lon" value="{{lon}}" />
+        </div>
+
+        {{#tags}}
+        <div data-role="fieldcontain">
+            <label for="poi-tag-{{key}}">{{key}}</label>
+            <input type="text" name="poi-lon" id="poi-lon" value="{{value}}" />
+        </div>
+        {{/tags}}
+    </form>
+</script>
+
 </head>
 <body onLoad="onBodyLoad();">
-    <div id="container">
-        <div id="topbar">
+    <div data-role="page" id="map-page">
+        <div data-role="header" id="map-header" >
             <button id="show-poi" class="btn">Show POIs</button>
         </div>
-        <div id="map">
+        <div id="map-container" data-role="content">
+            <div id="map">
+            </div>
+        </div>
+        <div id="map-footer" data-role="footer">
+            All actions should go here, I guess. 
+        </div>
+    </div>
+
+    <div data-role="page" id="poi-page">
+        <div data-role="header" id="poi-header">
+        </div>
+        <div data-role="content" id="poi-content">
+        </div>
+        <div data-role="footer" id="poi-footer">
         </div>
     </div>
 </body>

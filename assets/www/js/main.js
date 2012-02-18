@@ -4,8 +4,20 @@ function onBodyLoad() {
 }
 
 var map = null;
+function resizeContentArea() {
+    var content, contentHeight, footer, header, viewportHeight;
+    window.scroll(0, 0);
+    header = $(":jqmData(role='header'):visible");
+    footer = $(":jqmData(role='footer'):visible");
+    content = $(":jqmData(role='content'):visible");
+    viewportHeight = $(window).height();
+    contentHeight = viewportHeight - header.outerHeight() - footer.outerHeight();
+    $("article:jqmData(role='content')").first().height(contentHeight);
+    return $("#map").height(contentHeight);
+  };
 
 function init() {
+    $(window).bind('orientationchange pageshow resize', resizeContentArea);
     map = new L.Map('map');
 
     var tiles = new L.TileLayer('http://otile{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {
@@ -16,10 +28,30 @@ function init() {
     });
 
     map.addLayer(tiles);
-    map.locateAndSetView(16);
+    map.locateAndSetView(18, {enableHighAccuracy: true});
     map.on('locationfound', function() {
         console.log("Location found");
     });
+    resizeContentArea();
+}
+
+function convertForDisplay(poi) {
+    var tags = [];
+    $.each(poi.tags, function(key, value) {
+        tags.push({'key': key, 'value': value});
+    });
+    return {
+        id: poi.id,
+        lat: poi.lat,
+        lon: poi.lon,
+        tags: tags
+    };
+}
+
+function showPOI(poi) {
+    var template = templates.getTemplate("poi-template");
+    $("#poi-content").empty().html(template.render(convertForDisplay(poi))).trigger('create');
+    $.mobile.changePage('#poi-page');
 }
 
 $(function() {
@@ -52,8 +84,17 @@ $(function() {
                     return element.tags;
                 });
                 $.each(pois, function(i, poi) {
-                    var marker = new L.Marker(new L.LatLng(poi.lat, poi.lon));
-                    marker.bindPopup("<strong>" + poi.tags.name + "</strong>");
+                    var point = new L.LatLng(poi.lat, poi.lon);
+                    var marker = new L.Marker(point);
+                    var popup = new L.Popup({offset: new L.Point(0, -20)}, poi);
+                    popup.setLatLng(point);
+                    popup.setContent("<strong>" + poi.tags.name + "</strong>");
+                    marker.on('click', function() {
+                        showPOI(poi);
+                        map.openPopup(popup);
+                    });
+                    popup.on('click', function() {
+                    });
                     map.addLayer(marker);
                 });
             },
