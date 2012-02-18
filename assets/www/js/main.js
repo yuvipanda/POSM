@@ -87,13 +87,14 @@ $(function() {
                     var point = new L.LatLng(poi.lat, poi.lon);
                     var marker = new L.Marker(point);
                     var popup = new L.Popup({offset: new L.Point(0, -20)}, poi);
-                    popup.setLatLng(point);
-                    popup.setContent("<strong>" + poi.tags.name + "</strong>");
-                    marker.on('click', function() {
+                    var popupContent = $("<div><strong>" + poi.tags.name + "</strong></div>").click(function() {
                         showPOI(poi);
                         map.openPopup(popup);
-                    });
-                    popup.on('click', function() {
+                    })[0];
+                    popup.setLatLng(point);
+                    popup.setContent(popupContent);
+                    marker.on('click', function() {
+                        map.openPopup(popup);
                     });
                     map.addLayer(marker);
                 });
