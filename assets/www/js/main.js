@@ -10,6 +10,8 @@ function onBodyLoad() {
 }
 
 var map = null;
+var shownNodeIDs = [];
+
 function resizeContentArea() {
     var content, contentHeight, footer, header, viewportHeight;
     window.scroll(0, 0);
@@ -88,7 +90,7 @@ $(function() {
                             delete element.tags;
                         }
                     }
-                    return element.tags;
+                    return element.tags && ($.inArray(element.id, shownNodeIDs) == -1); 
                 });
                 $.each(pois, function(i, poi) {
                     var point = new L.LatLng(poi.lat, poi.lon);
@@ -104,6 +106,7 @@ $(function() {
                         map.openPopup(popup);
                     });
                     map.addLayer(marker);
+                    shownNodeIDs.push(poi.id);
                 });
             },
             error: function(err) {
