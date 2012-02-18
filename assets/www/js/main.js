@@ -83,6 +83,7 @@ $(function() {
                 var pois = elements.filter(function(element) {
                     if(element.tags) {
                         delete element.tags.source;
+                        delete element.tags.created_by;
                         if($.isEmptyObject(element.tags)) {
                             delete element.tags;
                         }
