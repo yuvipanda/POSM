@@ -1,6 +1,12 @@
 function onBodyLoad() {
     console.log('in on body load');
-	document.addEventListener("deviceready", function() { init(); }, true);
+    if(window.PhoneGap.available) {
+        document.addEventListener("deviceready", function() { init(); }, true);
+    } else {
+        $(function() {
+            init();
+        });
+    }
 }
 
 var map = null;
