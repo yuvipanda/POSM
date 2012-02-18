@@ -63,6 +63,10 @@ function showPOI(poi) {
 }
 
 $(function() {
+    $("#current-location").click(function() {
+        map.locateAndSetView();
+    });
+
     $("#show-poi").click(function() {
         var bounds = map.getBounds();
         var sw = bounds.getSouthWest();
