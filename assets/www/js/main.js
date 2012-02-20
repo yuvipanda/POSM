@@ -1,8 +1,15 @@
+var map = null;
+
+var OSMbaseURL = null;
+var currentChangesetID = null;
+
 function onBodyLoad() {
     if(window.PhoneGap.available) {
         document.addEventListener("deviceready", function() { init(); }, true);
+        OSMbaseURL = 'http://api.openstreetmap.org';
     } else {
         $(function() {
+            OSMbaseURL = "/osm/api/";
             init();
         });
     }
@@ -11,11 +18,6 @@ function onBodyLoad() {
 document.addEventListener("mobileinit", function() {
     $.mobile.page.prototype.options.backBtnText = "";
 }, true);
-
-var map = null;
-var OSMbaseURL = 'http://api.openstreetmap.org';
-
-var currentChangesetID = null;
 
 function resizeContentArea() {
     var content, contentHeight, footer, header, viewportHeight;
