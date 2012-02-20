@@ -23,6 +23,16 @@
     /*display: -webkit-box;*/
     /*-webkit-box-orient: horizontal;*/
 /*}*/
+.center-wrapper{
+text-align: center;
+}
+.center-wrapper * {
+margin: 0 auto;
+}
+
+.hidden {
+    display: none;
+}
 
 #map-container {
     margin: 0px;

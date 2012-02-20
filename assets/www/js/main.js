@@ -15,6 +15,9 @@ document.addEventListener("mobileinit", function() {
 var map = null;
 var shownNodeIDs = [];
 var deleteTags = ['^source$', '^created_by$', '^AND_'];
+var OSMbaseURL = 'http://api.openstreetmap.org';
+
+var currentChangesetID = null;
 
 function resizeContentArea() {
     var content, contentHeight, footer, header, viewportHeight;
@@ -82,6 +85,16 @@ function showPOI(poi) {
 $(function() {
     $("#current-location").click(function() {
         map.locateAndSetView();
+    });
+
+    $("#map-page").bind('pageshow', function(page) {
+        if(currentChangesetID) {
+            $("#logged-out-footer").hide();
+            $("#logged-in-footer").show();
+        } else {
+            $("#logged-in-footer").hide();
+            $("#logged-out-footer").show();
+        }
     });
 
     $("#show-poi").click(function() {
@@ -154,6 +167,28 @@ $(function() {
     $("#save-login").click(function() {
         localStorage.userName = $("#login-user-id").val();
         localStorage.password = $("#login-password").val();
-        history.back();
+        $.mobile.showPageLoadingMsg();
+        $.ajax({
+            url: OSMbaseURL + '/api/0.6/changeset/create',
+            type: 'POST',
+            // Need a way to properly do this, but bah
+            data: "<osm><changeset><tag k='created_by' v='POIOISM' /><tag k='comment' v='testing' /></changeset></osm>",
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader("X_HTTP_METHOD_OVERRIDE", "PUT");
+                xhr.setRequestHeader("Authorization", "Basic " + btoa(localStorage.userName + ":" + localStorage.password));
+            },
+            success: function(resp) {
+                currentChangesetID = resp;
+                console.log(resp);
+                $.mobile.hidePageLoadingMsg();
+                history.back();
+            },
+            error: function(err) {
+                console.log("error :(");
+                console.log(JSON.stringify(err));
+                $.mobile.hidePageLoadingMsg();
+                alert('Wrong Password!');
+            }
+        });
     });
 });
