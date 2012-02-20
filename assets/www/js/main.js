@@ -13,8 +13,6 @@ document.addEventListener("mobileinit", function() {
 }, true);
 
 var map = null;
-var shownNodeIDs = [];
-var deleteTags = ['^source$', '^created_by$', '^AND_'];
 var OSMbaseURL = 'http://api.openstreetmap.org';
 
 var currentChangesetID = null;
@@ -36,51 +34,19 @@ function init() {
     map = new L.Map('map');
 
     var tiles = new L.TileLayer('http://otile{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {
-        maxZoom: 18,
         subdomains: '1234', // for MapQuest tiles
         //attribution: 'Map data &copy; 2011 OpenStreetMap contributors'
         attribution: 'Tiles Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png">. Map data &copy; 2012 OpenStreetMap contributors'
     });
 
     map.addLayer(tiles);
-    map.locateAndSetView(18, {enableHighAccuracy: true});
+    map.locateAndSetView(20, {enableHighAccuracy: true});
     map.on('locationfound', function() {
         console.log("Location found");
     });
     resizeContentArea();
 }
 
-function convertForDisplay(poi) {
-    var tags = [];
-    var name = "Not named";
-    var $poi = $(poi);
-    $poi.find('tag').each(function(i, tag) {
-        $tag = $(tag);
-        var key = $(tag).attr('k');
-        var value = $(tag).attr('v');
-        if(key == 'name') {
-            name = value;
-            console.log('name is: ' + name);
-        } else {
-            tags.push({'key': key, 'value': value});
-        }
-    });
-    return {
-        id: $poi.attr('id'),
-        lat: $poi.attr('lat'),
-        lon: $poi.attr('lon'),
-        name: name,
-        tags: tags
-    };
-}
-
-function showPOI(poi) {
-    var template = templates.getTemplate("poi-template");
-    $("#poi-content").empty().html(template.render(poi));
-    $("#poi-name").html(poi.name || 'No name');
-    $.mobile.changePage('#poi-page');
-    $("#poi-page").trigger("create");
-}
 
 $(function() {
     $("#current-location").click(function() {
@@ -99,63 +65,7 @@ $(function() {
 
     $("#show-poi").click(function() {
         var bounds = map.getBounds();
-        var sw = bounds.getSouthWest();
-        var nw = bounds.getNorthEast();
-        var boundsString = "(" + sw.lat + "," + sw.lng + "," + nw.lat + "," + nw.lng + ")";
-        console.log(boundsString);
-        $.ajax({
-            url: "http://overpass.osm.rambler.ru/cgi/interpreter", 
-            data: {
-                data: "node" + boundsString + ";out body;"
-            },
-            dataType: "text",
-            success: function(resp) {
-                var $x = $($.parseXML(resp)); 
-                var elements = $x.find('node'); 
-                var pois = $.grep(elements, function(element) {
-                    var tags = $(element).find('tag');
-                    if(tags.length) {
-                        var to_delete = [];
-                        tags.each(function(i, tag) {
-                            var key = $(tag).attr('k');
-                            var value = $(tag).attr('v');
-                            $.each(deleteTags, function(i, regex) {
-                                if(key.match(new RegExp(regex))) {
-                                    to_delete.push(tag);
-                                }
-                            });
-                        });
-
-                        $.each(to_delete, function(i, tag) {
-                            $(tag).remove();
-                        });
-                    }
-                    console.log(element);
-                    return $(element).find('tag').length && ($.inArray(element.id, shownNodeIDs) == -1); 
-                });
-                $.each(pois, function(i, poi) {
-                    var poiData = convertForDisplay(poi);
-                    var point = new L.LatLng(poiData.lat, poiData.lon);
-                    var marker = new L.Marker(point);
-                    var popup = new L.Popup({offset: new L.Point(0, -20)}, poi);
-                    var popupContent = $("<div><strong>" + poiData.name + "</strong></div>").click(function() {
-                        showPOI(poiData);
-                        map.openPopup(popup);
-                    })[0];
-                    popup.setLatLng(point);
-                    popup.setContent(popupContent);
-                    marker.on('click', function() {
-                        map.openPopup(popup);
-                    });
-                    map.addLayer(marker);
-                    shownNodeIDs.push(poiData.id);
-                });
-            },
-            error: function(err) {
-                console.log("WAH WAH");
-                console.log(JSON.parse(err.responseText));
-            }
-        });
+        POIManager.getPOIsInBounds(bounds).done(POIManager.displayPOIs);
     });
 
     $("#login").click(function() {
@@ -179,7 +89,6 @@ $(function() {
             },
             success: function(resp) {
                 currentChangesetID = resp;
-                console.log(resp);
                 $.mobile.hidePageLoadingMsg();
                 history.back();
             },
