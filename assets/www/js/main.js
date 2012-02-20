@@ -1,5 +1,4 @@
 function onBodyLoad() {
-    console.log('in on body load');
     if(window.PhoneGap.available) {
         document.addEventListener("deviceready", function() { init(); }, true);
     } else {
@@ -50,24 +49,32 @@ function init() {
 
 function convertForDisplay(poi) {
     var tags = [];
-    $.each(poi.tags, function(key, value) {
-        if(key != 'name') {
+    var name = "Not named";
+    var $poi = $(poi);
+    $poi.find('tag').each(function(i, tag) {
+        $tag = $(tag);
+        var key = $(tag).attr('k');
+        var value = $(tag).attr('v');
+        if(key == 'name') {
+            name = value;
+            console.log('name is: ' + name);
+        } else {
             tags.push({'key': key, 'value': value});
         }
     });
     return {
-        id: poi.id,
-        lat: poi.lat,
-        lon: poi.lon,
-        name: poi.tags.name,
+        id: $poi.attr('id'),
+        lat: $poi.attr('lat'),
+        lon: $poi.attr('lon'),
+        name: name,
         tags: tags
     };
 }
 
 function showPOI(poi) {
     var template = templates.getTemplate("poi-template");
-    $("#poi-content").empty().html(template.render(convertForDisplay(poi)));
-    $("#poi-name").html(poi.tags.name || 'No name');
+    $("#poi-content").empty().html(template.render(poi));
+    $("#poi-name").html(poi.name || 'No name');
     $.mobile.changePage('#poi-page');
     $("#poi-page").trigger("create");
 }
@@ -86,42 +93,40 @@ $(function() {
         $.ajax({
             url: "http://overpass.osm.rambler.ru/cgi/interpreter", 
             data: {
-                data: "[out:json];node" + boundsString + ";out body;"
+                data: "node" + boundsString + ";out body;"
             },
             dataType: "text",
             success: function(resp) {
-                // Stupid bug in their API produces invalid JSON
-                // Emailed them about it, told me a fix is coming
-                // Till then
-                resp = resp.replace(/\\:/g, ':');
-                var data = JSON.parse(resp);
-                var elements = data.elements;
-                var pois = elements.filter(function(element) {
-                    if(element.tags) {
+                var $x = $($.parseXML(resp)); 
+                var elements = $x.find('node'); 
+                var pois = $.grep(elements, function(element) {
+                    var tags = $(element).find('tag');
+                    if(tags.length) {
                         var to_delete = [];
-                        $.each(element.tags, function(key, value) {
+                        tags.each(function(i, tag) {
+                            var key = $(tag).attr('k');
+                            var value = $(tag).attr('v');
                             $.each(deleteTags, function(i, regex) {
                                 if(key.match(new RegExp(regex))) {
-                                    to_delete.push(key);
+                                    to_delete.push(tag);
                                 }
                             });
                         });
 
-                        $.each(to_delete, function(i, key) {
-                            delete element.tags[key];
+                        $.each(to_delete, function(i, tag) {
+                            $(tag).remove();
                         });
-                        if($.isEmptyObject(element.tags)) {
-                            delete element.tags;
-                        }
                     }
-                    return element.tags && ($.inArray(element.id, shownNodeIDs) == -1); 
+                    console.log(element);
+                    return $(element).find('tag').length && ($.inArray(element.id, shownNodeIDs) == -1); 
                 });
                 $.each(pois, function(i, poi) {
-                    var point = new L.LatLng(poi.lat, poi.lon);
+                    var poiData = convertForDisplay(poi);
+                    var point = new L.LatLng(poiData.lat, poiData.lon);
                     var marker = new L.Marker(point);
                     var popup = new L.Popup({offset: new L.Point(0, -20)}, poi);
-                    var popupContent = $("<div><strong>" + poi.tags.name + "</strong></div>").click(function() {
-                        showPOI(poi);
+                    var popupContent = $("<div><strong>" + poiData.name + "</strong></div>").click(function() {
+                        showPOI(poiData);
                         map.openPopup(popup);
                     })[0];
                     popup.setLatLng(point);
@@ -130,7 +135,7 @@ $(function() {
                         map.openPopup(popup);
                     });
                     map.addLayer(marker);
-                    shownNodeIDs.push(poi.id);
+                    shownNodeIDs.push(poiData.id);
                 });
             },
             error: function(err) {
