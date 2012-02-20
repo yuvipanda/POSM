@@ -1,18 +1,18 @@
 var map = null;
 
-var OSMbaseURL = null;
-var overpassBaseURL = null;
 var currentChangesetID = null;
+var OSMbaseURL = 'http://api.openstreetmap.org';
+var overpassBaseURL = 'http://overpass.osm.rambler.ru/cgi/interpreter';
 
 function onBodyLoad() {
     if(window.PhoneGap.available) {
         document.addEventListener("deviceready", function() { init(); }, true);
-        OSMbaseURL = 'http://api.openstreetmap.org';
-        overpassBaseURL = 'http://overpass.osm.rambler.ru/cgi/interpreter';
     } else {
         $(function() {
-            OSMbaseURL = "/osm";
-            overpassBaseURL = '/overpass';
+            if(location.href.match(/^http/)) {
+                OSMbaseURL = "/osm";
+                overpassBaseURL = '/overpass';
+            }
             init();
         });
     }

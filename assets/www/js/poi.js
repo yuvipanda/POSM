@@ -42,7 +42,7 @@ POIManager = (function() {
                 d.resolve(pois);
             },
             error: function(err) {
-                console.reject(err); 
+                d.reject(err); 
             }
         });
 
