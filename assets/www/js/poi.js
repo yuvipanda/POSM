@@ -37,7 +37,6 @@ POIManager = (function() {
                             $(tag).remove();
                         });
                     }
-                    console.log(element);
                     return $(element).find('tag').length && ($.inArray(element.id, shownNodeIDs) == -1); 
                 });
                 d.resolve(pois);
@@ -60,7 +59,6 @@ POIManager = (function() {
             var value = $(tag).attr('v');
             if(key == 'name') {
                 name = value;
-                console.log('name is: ' + name);
             } else {
                 tags.push({'key': key, 'value': value});
             }
