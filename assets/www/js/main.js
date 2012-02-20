@@ -11,7 +11,7 @@ function onBodyLoad() {
         overpassBaseURL = 'http://overpass.osm.rambler.ru/cgi/interpreter';
     } else {
         $(function() {
-            OSMbaseURL = "/osm/api";
+            OSMbaseURL = "/osm";
             overpassBaseURL = '/overpass';
             init();
         });
