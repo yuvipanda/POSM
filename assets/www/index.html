@@ -12,6 +12,7 @@
 <script src="lib/jquery-1.7.1.min.js"></script>
 <script src="lib/jquery.mobile-1.0.1.js"></script>
 <script src="lib/hogan.min.js"></script>
+<script src="lib/jquery.timeago.js"></script>
 <script src="lib/templates.js"></script>
 
 <link rel="stylesheet" href="lib/leaflet/leaflet.css" />
@@ -50,6 +51,9 @@
             <li>No tags added</li>
         {{/tags}}
         </ul>
+        <div>
+            <small>Last updated <strong>{{lastUpdate}}</strong> by <strong>{{lastUser}}</strong></small>
+        </div>
     </div>
 </script>
 

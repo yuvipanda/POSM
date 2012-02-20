@@ -13,7 +13,7 @@ POIManager = (function() {
         $.ajax({
             url: overpassBaseURL,
             data: {
-                data: "node" + boundsString + ";out body;"
+                data: "node" + boundsString + ";out meta;"
             },
             dataType: "text",
             success: function(resp) {
@@ -67,6 +67,8 @@ POIManager = (function() {
             id: $poi.attr('id'),
             lat: $poi.attr('lat'),
             lon: $poi.attr('lon'),
+            lastUpdate: $.timeago($poi.attr('timestamp')),
+            lastUser: $poi.attr('user'),
             name: name,
             tags: tags
         };
