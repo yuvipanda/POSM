@@ -45,10 +45,29 @@ function init() {
         console.log("Location found");
     });
     resizeContentArea();
+
+    map.on('click', function(event) {
+        if(adding) { 
+            var name = prompt("Enter name");
+            POIManager.createPOI(event.latlng.lat, event.latlng.lng, name);
+            stopAdd();
+        }
+    });
 }
 
+var adding = false;
+function startAdd() {
+    adding = true;
+}
+
+function stopAdd() {
+    adding = false;
+}
 
 $(function() {
+    $("#add-poi").click(function() {
+        startAdd();
+    });
     $("#current-location").click(function() {
         map.locateAndSetView();
     });
@@ -74,6 +93,7 @@ $(function() {
         $("#login-password").val(localStorage.password);
         $.mobile.changePage("#login-dialog");
     });
+
     $("#save-login").click(function() {
         localStorage.userName = $("#login-user-id").val();
         localStorage.password = $("#login-password").val();

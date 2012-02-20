@@ -99,9 +99,39 @@ POIManager = (function() {
             shownNodeIDs.push(poiData.id);
         });
     }
-        
+    
+    function createPOI(lat, lon, name) {
+        var template = templates.getTemplate("node-template");
+        var poiData = {
+            changeset_id: currentChangesetID,
+            lat: lat,
+            lon: lon,
+            tags: [
+                {key: 'name', value: name}
+            ]
+        };
+        var poiXml = template.render(poiData);
+        console.log(poiXml);
+        $.ajax({
+            url: OSMbaseURL + '/api/0.6/node/create',
+            type: 'POST',
+            data: poiXml,
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader("X_HTTP_METHOD_OVERRIDE", "PUT");
+                xhr.setRequestHeader("Authorization", "Basic " + btoa(localStorage.userName + ":" + localStorage.password));
+            },
+            success: function(resp) {
+                alert("created with id #" + resp);
+            },
+            error: function(err) {
+                console.log(JSON.stringify(err));
+            }
+        });
+    }
+
     return {
         getPOIsInBounds: getPOIsInBounds,
-        displayPOIs: displayPOIs
+        displayPOIs: displayPOIs,
+        createPOI: createPOI
     };
 })();

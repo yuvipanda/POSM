@@ -20,7 +20,15 @@
 <script src="lib/leaflet/leaflet.js"></script>
 <script src="js/poi.js"></script>
 <script src="js/main.js"></script>
-
+<script type="text/html" id="node-template">
+    <osm>
+        <node changeset="{{changeset_id}}" lat="{{lat}}" lon="{{lon}}">
+            {{#tags}}
+            <tag k="{{key}}" v="{{value}}" />
+            {{/tags}}
+        </node>
+    </osm>
+</script>
 <script type="text/html" id="poi-template">
     <div>
         <div class="ui-grid-a">
