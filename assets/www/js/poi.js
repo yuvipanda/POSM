@@ -11,7 +11,7 @@ POIManager = (function() {
         var boundsString = "(" + sw.lat + "," + sw.lng + "," + nw.lat + "," + nw.lng + ")";
         console.log(boundsString);
         $.ajax({
-            url: "http://overpass.osm.rambler.ru/cgi/interpreter", 
+            url: overpassBaseURL,
             data: {
                 data: "node" + boundsString + ";out body;"
             },
