@@ -57,9 +57,11 @@ function init() {
 
     map.on('click', function(event) {
         if(adding) { 
-            var name = prompt("Enter name");
-            POIManager.createPOI(event.latlng.lat, event.latlng.lng, name);
-            stopAdd();
+            if(addMarker === null) {
+                 addMarker = new L.Marker(event.latlng, {draggable: true});
+                 map.addLayer(addMarker);
+                 setButtonText("#add-poi", "Save");
+            }
         }
     });
     map.on('moveend', function(event) {
@@ -70,6 +72,8 @@ function init() {
     });
 }
 
+var addMarker = null;
+
 function updatePOIs() {
     var bounds = map.getBounds();
     POIManager.getPOIsInBounds(bounds).done(POIManager.displayPOIs);
@@ -78,15 +82,32 @@ function updatePOIs() {
 var adding = false;
 function startAdd() {
     adding = true;
+    setButtonText("#add-poi", "Touch map to create");
 }
 
 function stopAdd() {
+    if(addMarker !== null) {
+        var name = prompt("Enter name");
+        var latlng = addMarker.getLatLng();
+        POIManager.createPOI(latlng.lat, latlng.lng, name);
+        map.removeLayer(addMarker);
+        setButtonText("#add-poi", "Add POI");
+        addMarker = null;
+    }
     adding = false;
+}
+
+function setButtonText(button, text) {
+    $(button + " .ui-btn-text").text(text);
 }
 
 $(function() {
     $("#add-poi").click(function() {
-        startAdd();
+        if(adding) {
+            stopAdd();
+        } else {
+            startAdd();
+        }
     });
     $("#current-location").click(function() {
         map.locateAndSetView(18, {enableHighAccuracy: true});
