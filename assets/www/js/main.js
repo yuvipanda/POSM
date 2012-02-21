@@ -4,6 +4,7 @@ var currentChangesetID = null;
 var OSMbaseURL = 'http://api.openstreetmap.org';
 var overpassBaseURL = 'http://overpass.osm.rambler.ru/cgi/interpreter';
 var autoPOI = false;
+var updateLocation = true;
 
 function onBodyLoad() {
     if(window.PhoneGap.available) {
@@ -48,38 +49,43 @@ var curPos = null;
 var accuracyCircle = null;
 
 function setCurrentPosition(latlng, accuracy) {
-    if(curPos) {
-        curPos.setLatLng(latlng);
-        map.removeLayer(accuracyCircle);
-        accuracyCircle  = new L.Circle(latlng, accuracy, {opacity: 0.1, weight: 1, clickable: false});
-        map.addLayer(accuracyCircle);
-    } else {
+    if(updateLocation) {
+        console.log("showing position");
+        if(curPos || accuracyCircle) {
+            map.removeLayer(accuracyCircle);
+            console.log('removed layers in add!');
+            map.removeLayer(curPos);
+        }
+
         curPos = new L.Marker(latlng, {icon: curPosIcon});
         accuracyCircle  = new L.Circle(latlng, accuracy, {opacity: 0.1, weight: 1, clickable: false});
         map.addLayer(curPos);
+        console.log('added layers!');
         map.addLayer(accuracyCircle);
     }
 
 }
 
-var watchID = null
+var watchID = null;
 function startWatching() {
-    watchID = navigator.geolocation.watchPosition(
-            function(pos) {
-                setCurrentPosition(new L.LatLng(pos.coords.latitude, pos.coords.longitude), pos.coords.accuracy);
-            }, function(err) {
-                console.log(JSON.stringify(err));
-            }, {enableHighAccuracy: true}
-        );
+    if(watchID === null) {
+        watchID = navigator.geolocation.watchPosition(
+                function(pos) {
+                    setCurrentPosition(new L.LatLng(pos.coords.latitude, pos.coords.longitude), pos.coords.accuracy);
+                }, function(err) {
+                    console.log(JSON.stringify(err));
+                }, {enableHighAccuracy: true}
+            );
+    }
 
 }
 
 function stopWatching() {
     navigator.geolocation.clearWatch(watchID);
+    watchID = null;
     map.removeLayer(accuracyCircle);
+    console.log('removed layers!');
     map.removeLayer(curPos);
-    curPos = null;
-    accuracyCircle = null;
 }   
 
 function init() {
@@ -152,10 +158,23 @@ $(function() {
         autoPOI = !autoPOI;
         // UGLY HACKS BAH
         if(autoPOI) {
-            $(this).removeClass("ui-btn-hover-a").removeClass("ui-btn-up-a").attr("data-theme", "e").addClass("ui-btn-down-e"); 
+            $(this).removeClass("ui-btn-hover-a").removeClass("ui-btn-up-a").attr("data-theme", "e").addClass("ui-btn-up-e"); 
             updatePOIs();
         } else {
-            $(this).removeClass("ui-btn-hover-e").removeClass("ui-btn-up-e").attr("data-theme", "a").addClass("ui-btn-down-a"); 
+            $(this).removeClass("ui-btn-hover-e").removeClass("ui-btn-up-e").attr("data-theme", "a").addClass("ui-btn-up-a"); 
+        }
+        $(this).trigger("create");
+    });
+
+    $("#current-location").click(function() {
+        updateLocation = !updateLocation;
+        // UGLY HACKS BAH
+        if(updateLocation) {
+            $(this).removeClass("ui-btn-hover-a").removeClass("ui-btn-up-a").attr("data-theme", "e").addClass("ui-btn-up-e"); 
+            startWatching();
+        } else {
+            $(this).removeClass("ui-btn-hover-e").removeClass("ui-btn-up-e").attr("data-theme", "a").addClass("ui-btn-up-a"); 
+            stopWatching();
         }
         $(this).trigger("create");
     });
