@@ -1,28 +1,6 @@
-/*body {*/
-    /*padding: 0;*/
-    /*margin: 0;*/
-/*}*/
-/*html, body {*/
-    /*height: 100%;*/
-    /*width: 100%;*/
-/*}*/
-
-/*#container {*/
-    /*display: -webkit-box;*/
-    /*-webkit-box-orient: vertical;*/
-    /*position: absolute;*/
-    /*top:0px;*/
-    /*bottom:0px;*/
-    /*right:0px;*/
-    /*left:0px;*/
-/*}*/
-
-/*#topbar {*/
-    /*height: 54px;*/
-    /*background-color: Black;*/
-    /*display: -webkit-box;*/
-    /*-webkit-box-orient: horizontal;*/
-/*}*/
+.large-button {
+    padding: 5px;
+}
 
 .center-wrapper{
 text-align: center;
