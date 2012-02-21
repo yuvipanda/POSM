@@ -63,6 +63,7 @@ POIManager = (function() {
                 tags.push({'key': key, 'value': value});
             }
         });
+        // Assume that if there's no meta information, user just created this thing :)
         return {
             id: $poi.attr('id'),
             lat: $poi.attr('lat'),
