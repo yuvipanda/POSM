@@ -76,6 +76,10 @@ function startWatching() {
 
 function stopWatching() {
     navigator.geolocation.clearWatch(watchID);
+    map.removeLayer(accuracyCircle);
+    map.removeLayer(curPos);
+    curPos = null;
+    accuracyCircle = null;
 }   
 
 function init() {
