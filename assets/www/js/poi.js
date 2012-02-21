@@ -21,6 +21,7 @@ POIManager = (function() {
                 var elements = $x.find('node'); 
                 var pois = $.grep(elements, function(element) {
                     var tags = $(element).find('tag');
+                    var id = $(element).attr('id');
                     if(tags.length) {
                         var to_delete = [];
                         tags.each(function(i, tag) {
@@ -37,7 +38,7 @@ POIManager = (function() {
                             $(tag).remove();
                         });
                     }
-                    return $(element).find('tag').length && ($.inArray(element.id, shownNodeIDs) == -1); 
+                    return $(element).find('tag').length && ($.inArray(id, shownNodeIDs) == -1); 
                 });
                 d.resolve(pois);
             },
