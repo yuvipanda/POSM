@@ -9,8 +9,8 @@ var updateLocation = true;
 function onBodyLoad() {
     if(window.PhoneGap.available) {
         document.addEventListener("deviceready", function() { init(); }, true);
-        document.addEventListener("resume", startWatching, false);
-        document.addEventListener("pause", stopWatching, false);
+        document.addEventListener("resume", curPosManager.startWatching, false);
+        document.addEventListener("pause", curPosManager.stopWatching, false);
     } else {
         $(function() {
             if(location.href.match(/^http/)) {
@@ -38,56 +38,6 @@ function resizeContentArea() {
     return $("#map").height(contentHeight);
   };
 
-var curPosIconClass = L.Icon.extend({
-    iconUrl: "img/curpos.png",
-    shadowUrl: null,
-    iconSize: new L.Point(40, 40),
-    iconAnchor: new L.Point(20, 20)
-});
-var curPosIcon = new curPosIconClass();
-var curPos = null;
-var accuracyCircle = null;
-
-function setCurrentPosition(latlng, accuracy) {
-    if(updateLocation) {
-        console.log("showing position");
-        if(curPos || accuracyCircle) {
-            map.removeLayer(accuracyCircle);
-            console.log('removed layers in add!');
-            map.removeLayer(curPos);
-        }
-
-        curPos = new L.Marker(latlng, {icon: curPosIcon});
-        accuracyCircle  = new L.Circle(latlng, accuracy, {opacity: 0.1, weight: 1, clickable: false});
-        map.addLayer(curPos);
-        console.log('added layers!');
-        map.addLayer(accuracyCircle);
-    }
-
-}
-
-var watchID = null;
-function startWatching() {
-    if(watchID === null) {
-        watchID = navigator.geolocation.watchPosition(
-                function(pos) {
-                    setCurrentPosition(new L.LatLng(pos.coords.latitude, pos.coords.longitude), pos.coords.accuracy);
-                }, function(err) {
-                    console.log(JSON.stringify(err));
-                }, {enableHighAccuracy: true}
-            );
-    }
-
-}
-
-function stopWatching() {
-    navigator.geolocation.clearWatch(watchID);
-    watchID = null;
-    map.removeLayer(accuracyCircle);
-    console.log('removed layers!');
-    map.removeLayer(curPos);
-}   
-
 function init() {
     $(window).bind('orientationchange pageshow resize', resizeContentArea);
     map = new L.Map('map');
@@ -101,11 +51,9 @@ function init() {
     map.addLayer(tiles);
     map.locateAndSetView(18, {enableHighAccuracy: true});
     map.on('locationfound', function(pos) {
-        setCurrentPosition(pos.latlng, pos.accuracy);
+        curPosManager.showPosition(pos.latlng, pos.accuracy);
     });
     resizeContentArea();
-
-    startWatching();
 
     map.on('click', function(event) {
         if(adding) { 
@@ -171,10 +119,10 @@ $(function() {
         // UGLY HACKS BAH
         if(updateLocation) {
             $(this).removeClass("ui-btn-hover-a").removeClass("ui-btn-up-a").attr("data-theme", "e").addClass("ui-btn-up-e"); 
-            startWatching();
+            curPosManager.startWatching();
         } else {
             $(this).removeClass("ui-btn-hover-e").removeClass("ui-btn-up-e").attr("data-theme", "a").addClass("ui-btn-up-a"); 
-            stopWatching();
+            curPosManager.stopWatching();
         }
         $(this).trigger("create");
     });
