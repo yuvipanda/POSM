@@ -97,6 +97,7 @@ function stopAdd() {
     adding = false;
 }
 
+// Ugly fucking hack
 function setButtonText(button, text) {
     $(button + " .ui-btn-text").text(text);
 }
