@@ -36,19 +36,26 @@ function resizeContentArea() {
   };
 
 var curPosIconClass = L.Icon.extend({
-    iconUrl: "curpos.png",
+    iconUrl: "img/curpos.png",
     shadowUrl: null,
-    iconSize: L.Point(40, 40)
+    iconSize: new L.Point(40, 40),
+    iconAnchor: new L.Point(20, 20)
 });
 var curPosIcon = new curPosIconClass();
 var curPos = null;
+var accuracyCircle = null;
 
-function setCurrentPosition(latlng) {
+function setCurrentPosition(latlng, accuracy) {
     if(curPos) {
         curPos.setLatLng(latlng);
+        map.removeLayer(accuracyCircle);
+        accuracyCircle  = new L.Circle(latlng, accuracy, {opacity: 0.1, weight: 1, clickable: false});
+        map.addLayer(accuracyCircle);
     } else {
         curPos = new L.Marker(latlng, {icon: curPosIcon});
+        accuracyCircle  = new L.Circle(latlng, accuracy, {opacity: 0.1, weight: 1, clickable: false});
         map.addLayer(curPos);
+        map.addLayer(accuracyCircle);
     }
 
 }
@@ -67,12 +74,12 @@ function init() {
     map.addLayer(tiles);
     map.locateAndSetView(18, {enableHighAccuracy: true});
     map.on('locationfound', function(pos) {
-        setCurrentPosition(pos.latlng);
+        setCurrentPosition(pos.latlng, pos.accuracy);
     });
     resizeContentArea();
 
     navigator.geolocation.watchPosition(function(pos) {
-        setCurrentPosition(new L.LatLng(pos.coords.lat, pos.coords.lon));
+        setCurrentPosition(new L.LatLng(pos.coords.latitude, pos.coords.longitude), pos.coords.accuracy);
     }, function(err) {
         console.log(JSON.stringify(err));
     }, {enableHighAccuracy: true});
