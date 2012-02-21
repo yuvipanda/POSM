@@ -3,6 +3,7 @@ var map = null;
 var currentChangesetID = null;
 var OSMbaseURL = 'http://api.openstreetmap.org';
 var overpassBaseURL = 'http://overpass.osm.rambler.ru/cgi/interpreter';
+var autoPOI = false;
 
 function onBodyLoad() {
     if(window.PhoneGap.available) {
@@ -58,7 +59,18 @@ function init() {
             stopAdd();
         }
     });
+    map.on('moveend', function(event) {
+        if(autoPOI) {
+            updatePOIs();
+        }
+        return true;
+    });
 }
+
+function updatePOIs() {
+    var bounds = map.getBounds();
+    POIManager.getPOIsInBounds(bounds).done(POIManager.displayPOIs);
+};
 
 var adding = false;
 function startAdd() {
@@ -88,9 +100,17 @@ $(function() {
     });
 
     $("#show-poi").click(function() {
-        var bounds = map.getBounds();
-        POIManager.getPOIsInBounds(bounds).done(POIManager.displayPOIs);
+        autoPOI = !autoPOI;
+        // UGLY HACKS BAH
+        if(autoPOI) {
+            $(this).removeClass("ui-btn-hover-a").removeClass("ui-btn-up-a").attr("data-theme", "e").addClass("ui-btn-down-e"); 
+            updatePOIs();
+        } else {
+            $(this).removeClass("ui-btn-hover-e").removeClass("ui-btn-up-e").attr("data-theme", "a").addClass("ui-btn-down-a"); 
+        }
+        $(this).trigger("create");
     });
+
 
     $("#login").click(function() {
         $("#login-user-id").val(localStorage.userName);
