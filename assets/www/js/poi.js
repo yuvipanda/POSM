@@ -67,8 +67,8 @@ POIManager = (function() {
             id: $poi.attr('id'),
             lat: $poi.attr('lat'),
             lon: $poi.attr('lon'),
-            lastUpdate: $.timeago($poi.attr('timestamp')),
-            lastUser: $poi.attr('user'),
+            lastUpdate: $.timeago($poi.attr('timestamp') || new Date()),
+            lastUser: $poi.attr('user') || localStorage.userName,
             name: name,
             tags: tags
         };
@@ -82,23 +82,27 @@ POIManager = (function() {
         $("#poi-page").trigger("create");
     }
 
+    function displayPOI(poi) {
+        var poiData = convertForDisplay(poi);
+        var point = new L.LatLng(poiData.lat, poiData.lon);
+        var marker = new L.Marker(point);
+        var popup = new L.Popup({offset: new L.Point(0, -20)}, poi);
+        var popupContent = $("<div><strong>" + poiData.name + "</strong></div>").click(function() {
+            showPOI(poiData);
+            map.openPopup(popup);
+        })[0];
+        popup.setLatLng(point);
+        popup.setContent(popupContent);
+        marker.on('click', function() {
+            map.openPopup(popup);
+        });
+        map.addLayer(marker);
+        shownNodeIDs.push(poiData.id);
+    }
+
     function displayPOIs(pois) {
         $.each(pois, function(i, poi) {
-            var poiData = convertForDisplay(poi);
-            var point = new L.LatLng(poiData.lat, poiData.lon);
-            var marker = new L.Marker(point);
-            var popup = new L.Popup({offset: new L.Point(0, -20)}, poi);
-            var popupContent = $("<div><strong>" + poiData.name + "</strong></div>").click(function() {
-                showPOI(poiData);
-                map.openPopup(popup);
-            })[0];
-            popup.setLatLng(point);
-            popup.setContent(popupContent);
-            marker.on('click', function() {
-                map.openPopup(popup);
-            });
-            map.addLayer(marker);
-            shownNodeIDs.push(poiData.id);
+            displayPOI(poi);
         });
     }
     
@@ -124,6 +128,8 @@ POIManager = (function() {
             },
             success: function(resp) {
                 alert("created with id #" + resp);
+                console.log($(poiXml).find('node'));
+                displayPOI($(poiXml).find('node'));
             },
             error: function(err) {
                 console.log(JSON.stringify(err));
