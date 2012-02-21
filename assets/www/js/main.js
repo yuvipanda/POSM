@@ -109,9 +109,6 @@ $(function() {
             startAdd();
         }
     });
-    $("#current-location").click(function() {
-        map.locateAndSetView(18, {enableHighAccuracy: true});
-    });
 
     $("#map-page").bind('pageshow', function(page) {
         if(currentChangesetID) {
