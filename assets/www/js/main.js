@@ -8,6 +8,8 @@ var autoPOI = false;
 function onBodyLoad() {
     if(window.PhoneGap.available) {
         document.addEventListener("deviceready", function() { init(); }, true);
+        document.addEventListener("resume", startWatching, false);
+        document.addEventListener("pause", stopWatching, false);
     } else {
         $(function() {
             if(location.href.match(/^http/)) {
@@ -59,13 +61,28 @@ function setCurrentPosition(latlng, accuracy) {
     }
 
 }
+
+var watchID = null
+function startWatching() {
+    watchID = navigator.geolocation.watchPosition(
+            function(pos) {
+                setCurrentPosition(new L.LatLng(pos.coords.latitude, pos.coords.longitude), pos.coords.accuracy);
+            }, function(err) {
+                console.log(JSON.stringify(err));
+            }, {enableHighAccuracy: true}
+        );
+
+}
+
+function stopWatching() {
+    navigator.geolocation.clearWatch(watchID);
+}   
+
 function init() {
     $(window).bind('orientationchange pageshow resize', resizeContentArea);
     map = new L.Map('map');
 
     var tiles = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        minZoom: 12,
-        maxZoom: 18,
         //attribution: 'Map data &copy; 2011 OpenStreetMap contributors'
         attribution: 'Tiles Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png">. Map data &copy; 2012 OpenStreetMap contributors'
     });
@@ -78,11 +95,7 @@ function init() {
     });
     resizeContentArea();
 
-    navigator.geolocation.watchPosition(function(pos) {
-        setCurrentPosition(new L.LatLng(pos.coords.latitude, pos.coords.longitude), pos.coords.accuracy);
-    }, function(err) {
-        console.log(JSON.stringify(err));
-    }, {enableHighAccuracy: true});
+    startWatching();
 
     map.on('click', function(event) {
         if(adding) { 
