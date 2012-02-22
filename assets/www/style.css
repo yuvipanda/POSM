@@ -34,7 +34,7 @@ img.spinner {
     -webkit-box-orient: horizontal;
     -webkit-box-pack: center;
     -webkit-box-align: center;
-    height: 42px;
+    height: 32px;
 }
 
 .ui-header .header-text {

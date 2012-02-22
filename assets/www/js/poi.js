@@ -81,7 +81,6 @@ POIManager = (function() {
     function showPOI(poi) {
         var template = templates.getTemplate("poi-template");
         $("#poi-content").empty().html(template.render(poi));
-        $("#poi-name").html(poi.name || 'No name');
         $.mobile.changePage('#poi-page');
         $("#poi-page").trigger("create");
     }
