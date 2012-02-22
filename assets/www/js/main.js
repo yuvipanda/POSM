@@ -6,6 +6,11 @@ var overpassBaseURL = 'http://overpass.osm.rambler.ru/cgi/interpreter';
 var autoPOI = false;
 var updateLocation = true;
 
+var newMarkerIconClass = L.Icon.extend({
+    iconUrl: "img/new-marker.png",
+});
+var newMarkerIcon = new newMarkerIconClass();
+
 function onBodyLoad() {
     if(window.PhoneGap.available) {
         document.addEventListener("deviceready", function() { init(); }, true);
@@ -58,7 +63,7 @@ function init() {
     map.on('click', function(event) {
         if(adding) { 
             if(addMarker === null) {
-                 addMarker = new L.Marker(event.latlng, {draggable: true});
+                 addMarker = new L.Marker(event.latlng, {draggable: true, icon: newMarkerIcon});
                  map.addLayer(addMarker);
                  setButtonText("#add-poi", "Save");
             }
