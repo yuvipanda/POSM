@@ -76,7 +76,7 @@ var addMarker = null;
 
 function updatePOIs() {
     var bounds = map.getBounds();
-    POIManager.getPOIsInBounds(bounds).done(POIManager.displayPOIs);
+    POIManager.getPOIsInBounds(bounds).done(POIManager.displayPOIMarkers);
 };
 
 var adding = false;

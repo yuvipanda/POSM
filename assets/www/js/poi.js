@@ -84,7 +84,9 @@ POIManager = (function() {
         $("#poi-page").trigger("create");
     }
 
-    function displayPOI(poi) {
+    function displayPOIMarker(poi) {
+        var d = $.Deferred();
+
         var poiData = convertForDisplay(poi);
         var point = new L.LatLng(poiData.lat, poiData.lon);
         var marker = new L.Marker(point);
@@ -100,14 +102,40 @@ POIManager = (function() {
         });
         map.addLayer(marker);
         shownNodeIDs.push(poiData.id);
+
+        d.resolve(marker, popup);
+        return d;
     }
 
-    function displayPOIs(pois) {
+    function displayPOIMarkers(pois) {
         $.each(pois, function(i, poi) {
-            displayPOI(poi);
+            displayPOIMarker(poi);
         });
     }
-    
+   
+    function retrievePOI(id) {
+        var d = $.Deferred();
+        $.ajax({
+            url: OSMbaseURL + '/api/0.6/node/' + id,
+            type: 'GET',
+            datatype: 'xml',
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader("Authorization", "Basic " + btoa(localStorage.userName + ":" + localStorage.password));
+            },
+            success: function(resp) {
+                var node = $(resp).find('node');
+                displayPOIMarker(node);
+                d.resolve(node);
+            },
+            error: function(err) {
+                console.log('no POI for id ' + id);
+                console.log(JSON.stringify(err));
+                d.reject(err);
+            }
+        });
+        return d;
+    }
+
     function createPOI(lat, lon, name) {
         var template = templates.getTemplate("node-template");
         var poiData = {
@@ -128,10 +156,13 @@ POIManager = (function() {
                 xhr.setRequestHeader("X_HTTP_METHOD_OVERRIDE", "PUT");
                 xhr.setRequestHeader("Authorization", "Basic " + btoa(localStorage.userName + ":" + localStorage.password));
             },
-            success: function(resp) {
-                alert("created with id #" + resp);
-                console.log($(poiXml).find('node'));
-                displayPOI($(poiXml).find('node'));
+            success: function(id) {
+                alert("created with id #" + id);
+                retrievePOI(id).then(function(node) {
+                    displayPOIMarker(node).then(function(marker, popup) { 
+                        map.openPopup(popup);
+                    });
+                });
             },
             error: function(err) {
                 console.log(JSON.stringify(err));
@@ -141,7 +172,7 @@ POIManager = (function() {
 
     return {
         getPOIsInBounds: getPOIsInBounds,
-        displayPOIs: displayPOIs,
+        displayPOIMarkers: displayPOIMarkers,
         createPOI: createPOI
     };
 })();
