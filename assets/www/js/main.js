@@ -107,6 +107,14 @@ function setButtonText(button, text) {
     $(button + " .ui-btn-text").text(text);
 }
 
+function startSpinImg(selector) {
+    $(selector).addClass("spinner");
+}
+
+function stopSpinImg(selector) {
+    $(selector).removeClass("spinner");
+}
+
 $(function() {
     $("#add-poi").click(function() {
         if(adding) {
@@ -125,30 +133,42 @@ $(function() {
             $("#logged-out-footer").show();
         }
     });
-
+ 
+    $(".img-btn").bind('vmousedown', function() {
+        $(this).addClass("ui-bar-e");
+    }).bind('vmouseup', function() {
+        $(this).removeClass("ui-bar-e");
+    });
+    $(".img-toggle").click(function() {
+        if($(this).attr('pressed')) {
+            $(this).removeClass("ui-bar-e");
+            $(this).removeAttr('pressed');
+        } else {
+            $(this).attr("pressed", "pressed");
+            $(this).addClass("ui-bar-e");
+        }
+    });
     $("#show-poi").click(function() {
         autoPOI = !autoPOI;
         // UGLY HACKS BAH
         if(autoPOI) {
-            $(this).removeClass("ui-btn-hover-a").removeClass("ui-btn-up-a").attr("data-theme", "e").addClass("ui-btn-up-e"); 
             updatePOIs();
-        } else {
-            $(this).removeClass("ui-btn-hover-e").removeClass("ui-btn-up-e").attr("data-theme", "a").addClass("ui-btn-up-a"); 
         }
-        $(this).trigger("create");
     });
 
     $("#current-location").click(function() {
-        updateLocation = !updateLocation;
-        // UGLY HACKS BAH
-        if(updateLocation) {
-            $(this).removeClass("ui-btn-hover-a").removeClass("ui-btn-up-a").attr("data-theme", "e").addClass("ui-btn-up-e"); 
-            curPosManager.startWatching();
-        } else {
-            $(this).removeClass("ui-btn-hover-e").removeClass("ui-btn-up-e").attr("data-theme", "a").addClass("ui-btn-up-a"); 
-            curPosManager.stopWatching();
-        }
-        $(this).trigger("create");
+        map.locateAndSetView(map.getZoom(), {enableHighAccuracy: true});
+    //$("#current-location").click(function() {
+        //updateLocation = !updateLocation;
+        //// UGLY HACKS BAH
+        //if(updateLocation) {
+            //$(this).removeClass("ui-btn-hover-a").removeClass("ui-btn-up-a").attr("data-theme", "e").addClass("ui-btn-up-e"); 
+            //curPosManager.startWatching();
+        //} else {
+            //$(this).removeClass("ui-btn-hover-e").removeClass("ui-btn-up-e").attr("data-theme", "a").addClass("ui-btn-up-a"); 
+            //curPosManager.stopWatching();
+        //}
+        //$(this).trigger("create");
     });
 
 

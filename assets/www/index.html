@@ -62,28 +62,23 @@
 <body onLoad="onBodyLoad();">
     <div data-role="page" id="map-page">
         <div data-role="header" id="map-header" class="center-wrapper">
-            <div data-role="controlgroup" data-type="horizontal">
-                <a href="#" data-icon="refresh" data-iconpos="notext" data-theme="a" id="show-poi" data-role="button" class="large-button">Show POIs</a>
-                <a href="#" id="current-location" data-theme="e" data-icon="home" data-iconpos="notext" data-role="button" class="large-button">Current Location</a>
-            </div>
+            Title and login should go here
         </div>
         <div id="map-container" data-role="content">
             <div id="map">
             </div>
         </div>
-        <div id="map-footer" data-role="footer" class="center-wrapper">
-            <div data-role="controlgroup" data-type="horizontal" id="logged-out-footer">
-                <a href="#" id="login" class="large-button" data-role="button">Login</a>
-            </div>
-            <div class="hidden" data-role="controlgroup" data-type="horizontal" id="logged-in-footer">
-                <a href="#" id="add-poi" class="large-button" data-role="button">Add POI</a>
-            </div>
+        <div id="map-footer" data-role="footer">
+                <div class="img-toggle"> <img src="img/refresh.png" id="show-poi" /> </div>
+                <div id="status-text-container"><span id="status-text">Just some testing stuff</span></div>
+                <div class="img-btn"><img  src="img/mylocation.png" id="current-location" /> </div>
         </div>
     </div>
 
-    <div data-role="page" id="poi-page" data-add-back-btn="true">
+    <div data-role="page" id="poi-page">
         <div data-role="header" id="poi-header">
-            <h1 id="poi-name"></h1>
+            <div class="img-btn"><a href="#" data-rel="back"><img src="img/back.png" /></a></div>
+            <div class="header-text" id="poi-name"></div>
         </div>
         <div data-role="content" id="poi-content">
         </div>

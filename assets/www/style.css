@@ -10,8 +10,50 @@ text-align: center;
 margin: 0 auto;
 }
 
+
 .hidden {
     display: none;
+}
+@-webkit-keyframes rotate {
+  from {
+    -webkit-transform: rotate(0deg);
+  }
+  to { 
+    -webkit-transform: rotate(360deg);
+  }
+}
+img.spinner {
+      -webkit-animation-name: rotate;
+      -webkit-animation-duration: 1.5s;
+      -webkit-animation-iteration-count: infinite;
+      -webkit-animation-timing-function: linear;
+}
+
+.ui-footer, .ui-header {
+    display: -webkit-box;
+    -webkit-box-orient: horizontal;
+    -webkit-box-pack: center;
+    -webkit-box-align: center;
+    height: 42px;
+}
+
+.ui-header .header-text {
+    -webkit-box-flex: 1;
+}
+
+#status-text-container {
+    -webkit-box-flex: 1;
+    display: -webkit-box;
+    -webkit-box-orient: horizontal;
+    -webkit-box-pack: center;
+    -webkit-box-align: center;
+
+    font-weight: normal;
+}
+
+.right {
+    float: right;
+    clear: both;
 }
 
 #map-container {

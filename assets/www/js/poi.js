@@ -10,6 +10,7 @@ POIManager = (function() {
         var nw = bounds.getNorthEast();
         var boundsString = "(" + sw.lat + "," + sw.lng + "," + nw.lat + "," + nw.lng + ")";
         console.log(boundsString);
+        startSpinImg("#show-poi");
         $.ajax({
             url: overpassBaseURL,
             data: {
@@ -40,6 +41,7 @@ POIManager = (function() {
                     }
                     return $(element).find('tag').length && ($.inArray(id, shownNodeIDs) == -1); 
                 });
+                stopSpinImg("#show-poi");
                 d.resolve(pois);
             },
             error: function(err) {
