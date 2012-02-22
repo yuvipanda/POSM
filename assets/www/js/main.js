@@ -151,16 +151,6 @@ $(function() {
         }
     });
 
-    $("#map-page").bind('pageshow', function(page) {
-        if(currentChangesetID) {
-            $("#logged-out-footer").hide();
-            $("#logged-in-footer").show();
-        } else {
-            $("#logged-in-footer").hide();
-            $("#logged-out-footer").show();
-        }
-    });
- 
     $(".img-btn").bind('vmousedown', function() {
         $(this).addClass("ui-bar-e");
     }).bind('vmouseup', function() {
@@ -177,7 +167,6 @@ $(function() {
     });
     $("#show-poi").click(function() {
         autoPOI = !autoPOI;
-        // UGLY HACKS BAH
         if(autoPOI) {
             updatePOIs();
         }
@@ -185,17 +174,6 @@ $(function() {
 
     $("#current-location").click(function() {
         map.locateAndSetView(map.getZoom(), {enableHighAccuracy: true});
-    //$("#current-location").click(function() {
-        //updateLocation = !updateLocation;
-        //// UGLY HACKS BAH
-        //if(updateLocation) {
-            //$(this).removeClass("ui-btn-hover-a").removeClass("ui-btn-up-a").attr("data-theme", "e").addClass("ui-btn-up-e"); 
-            //curPosManager.startWatching();
-        //} else {
-            //$(this).removeClass("ui-btn-hover-e").removeClass("ui-btn-up-e").attr("data-theme", "a").addClass("ui-btn-up-a"); 
-            //curPosManager.stopWatching();
-        //}
-        //$(this).trigger("create");
     });
 
 
@@ -209,27 +187,25 @@ $(function() {
     $("#save-login").click(function() {
         localStorage.userName = $("#login-user-id").val();
         localStorage.password = $("#login-password").val();
-        $.mobile.showPageLoadingMsg();
-        $.ajax({
-            url: OSMbaseURL + '/api/0.6/changeset/create',
-            type: 'POST',
-            // Need a way to properly do this, but bah
-            data: "<osm><changeset><tag k='created_by' v='POIOISM' /><tag k='comment' v='testing' /></changeset></osm>",
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader("X_HTTP_METHOD_OVERRIDE", "PUT");
-                xhr.setRequestHeader("Authorization", "Basic " + btoa(localStorage.userName + ":" + localStorage.password));
-            },
-            success: function(resp) {
-                currentChangesetID = resp;
-                $.mobile.hidePageLoadingMsg();
-                history.back();
-            },
-            error: function(err) {
-                console.log("error :(");
-                console.log(JSON.stringify(err));
-                $.mobile.hidePageLoadingMsg();
-                alert('Wrong Password!');
-            }
+        changesets.createChangeset().then(function(id) {
+            localStorage.currentChangesetID = id;
+            $.mobile.hidePageLoadingMsg();
+            history.back();
+        }).fail(function(err) {
+            console.log(JSON.stringify(err));
+            $.mobile.hidePageLoadingMsg();
+            alert("Error logging in. Wrong password?");
         });
+        $.mobile.showPageLoadingMsg();
     });
 });
+
+// getBeforeSend - return function that adds basic authentication and fakes request method.
+function makeBeforeSend(method) {
+    return function(xhr) {
+        xhr.setRequestHeader("X_HTTP_METHOD_OVERRIDE", method);
+        xhr.setRequestHeader("Authorization", "Basic " + btoa(localStorage.userName + ":" + localStorage.password));
+    };
+}
+
+
