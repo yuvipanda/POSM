@@ -34,21 +34,24 @@ img.spinner {
     -webkit-box-orient: horizontal;
     -webkit-box-pack: center;
     -webkit-box-align: center;
-    height: 32px;
+    height: 38px;
 }
 
-.ui-header .header-text {
+.text {
     -webkit-box-flex: 1;
 }
 
-#status-text-container {
+#add-poi {
+    font-weight: normal;
+}
+
+.footer-text-container {
     -webkit-box-flex: 1;
     display: -webkit-box;
     -webkit-box-orient: horizontal;
     -webkit-box-pack: center;
     -webkit-box-align: center;
-
-    font-weight: normal;
+    height: 100%;
 }
 
 .right {

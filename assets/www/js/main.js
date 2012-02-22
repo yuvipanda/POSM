@@ -6,6 +6,8 @@ var overpassBaseURL = 'http://overpass.osm.rambler.ru/cgi/interpreter';
 var autoPOI = false;
 var updateLocation = true;
 
+var ADD_TEXT = "Tap to add point";
+
 var newMarkerIconClass = L.Icon.extend({
     iconUrl: "img/new-marker.png",
 });
@@ -65,7 +67,7 @@ function init() {
             if(addMarker === null) {
                  addMarker = new L.Marker(event.latlng, {draggable: true, icon: newMarkerIcon});
                  map.addLayer(addMarker);
-                 setButtonText("#add-poi", "Save");
+                 setStatus("Tap to save");
             }
         }
     });
@@ -87,17 +89,42 @@ function updatePOIs() {
 var adding = false;
 function startAdd() {
     adding = true;
-    setButtonText("#add-poi", "Touch map to create");
+    setStatus("Touch location on map");
+    $("#add-poi").find('img').attr('src', 'img/save.png');
+}
+
+function setStatus(html) {
+    $("#add-poi").html(html);
+}
+
+function flashStatus(flashHtml, thenHtml) {
+
+    $("#add-poi").html(flashHtml);
+    setTimeout(function() {
+        $("#add-poi").html(thenHtml);
+    }, 2 * 1000);
 }
 
 function stopAdd() {
     if(addMarker !== null) {
         var name = prompt("Enter name");
-        var latlng = addMarker.getLatLng();
-        POIManager.createPOI(latlng.lat, latlng.lng, name);
-        map.removeLayer(addMarker);
-        setButtonText("#add-poi", "Add POI");
-        addMarker = null;
+        if(name) {
+            var latlng = addMarker.getLatLng();
+            setStatus("Creating...");
+            POIManager.createPOI(latlng.lat, latlng.lng, name).then(function() {
+                map.removeLayer(addMarker);
+                addMarker = null;
+                setStatus(ADD_TEXT);
+            }).fail(function() {
+                flashStatus("Creation failed :(", ADD_TEXT);
+                map.removeLayer(addMarker);
+                addMarker = null;
+            });
+        } else {
+            flashStatus("Creation cancelled", ADD_TEXT);
+            map.removeLayer(addMarker);
+            addMarker = null;
+        }
     }
     adding = false;
 }

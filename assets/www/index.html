@@ -62,8 +62,8 @@
 <body onLoad="onBodyLoad();">
     <div data-role="page" id="map-page">
         <div data-role="header" id="map-header" class="center-wrapper">
-            <div class="header-text">POIOSM</div>
-            <div class="img-btn"><img src="img/create.png" /></div>
+            <div class="text">POIOSM</div>
+            <div class="img-btn" id="login"><img src="img/preferences.png" /></div>
         </div>
         <div id="map-container" data-role="content">
             <div id="map">
@@ -71,7 +71,7 @@
         </div>
         <div id="map-footer" data-role="footer">
                 <div class="img-toggle"> <img src="img/refresh.png" id="show-poi" /> </div>
-                <div id="status-text-container"><span id="status-text">Just some testing stuff</span></div>
+                <div class="footer-text-container img-btn" id="add-poi">Tap here to create</div>
                 <div class="img-btn"><img  src="img/mylocation.png" id="current-location" /> </div>
         </div>
     </div>
@@ -79,7 +79,7 @@
     <div data-role="page" id="poi-page">
         <div data-role="header" id="poi-header">
             <div class="img-btn"><a href="#" data-rel="back"><img src="img/back.png" /></a></div>
-            <div class="header-text" id="poi-name">POI Details</div>
+            <div class="text" id="poi-name">POI Details</div>
         </div>
         <div data-role="content" id="poi-content">
         </div>
@@ -89,7 +89,8 @@
 
     <div data-role="page" id="login-dialog">
         <div data-role="header" id="login-header">
-            <h2>OSM Login</h2>
+            <div class="img-btn"><a href="#" data-rel="back"><img src="img/back.png" /></a></div>
+            <div class="text" id="poi-name">OSM Login</div>
         </div>
         <div data-role="content" id="login-content">
             <div data-role="fieldcontain">

@@ -138,6 +138,8 @@ POIManager = (function() {
     }
 
     function createPOI(lat, lon, name) {
+        var d = $.Deferred();
+
         var template = templates.getTemplate("node-template");
         var poiData = {
             changeset_id: currentChangesetID,
@@ -158,17 +160,19 @@ POIManager = (function() {
                 xhr.setRequestHeader("Authorization", "Basic " + btoa(localStorage.userName + ":" + localStorage.password));
             },
             success: function(id) {
-                alert("created with id #" + id);
                 retrievePOI(id).then(function(node) {
                     displayPOIMarker(node).then(function(marker, popup) { 
                         map.openPopup(popup);
                     });
                 });
+                d.resolve(id);
             },
             error: function(err) {
                 console.log(JSON.stringify(err));
+                d.reject(err);
             }
         });
+        return d;
     }
 
     return {
