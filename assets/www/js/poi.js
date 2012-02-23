@@ -142,7 +142,7 @@ POIManager = (function() {
 
         var template = templates.getTemplate("node-template");
         var poiData = {
-            changeset_id: localStorage.currentChangesetID,
+            changeset_id: currentChangesetID,
             lat: lat,
             lon: lon,
             tags: [

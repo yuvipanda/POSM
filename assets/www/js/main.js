@@ -54,7 +54,6 @@ function init() {
         attribution: 'Tiles Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png">. Map data &copy; 2012 OpenStreetMap contributors'
     });
 
-
     map.addLayer(tiles);
     map.locateAndSetView(18, {enableHighAccuracy: true});
     map.on('locationfound', function(pos) {
@@ -185,19 +184,39 @@ $(function() {
     });
 
     $("#save-login").click(function() {
-        localStorage.userName = $("#login-user-id").val();
-        localStorage.password = $("#login-password").val();
+        localStorage.userName = $.trim($("#login-user-id").val());
+        localStorage.password = $.trim($("#login-password").val());
+        $.mobile.showPageLoadingMsg();
         changesets.createChangeset().then(function(id) {
-            localStorage.currentChangesetID = id;
+            currentChangesetID = id;
             $.mobile.hidePageLoadingMsg();
             history.back();
+            setStatus(ADD_TEXT);
         }).fail(function(err) {
             console.log(JSON.stringify(err));
             $.mobile.hidePageLoadingMsg();
-            alert("Error logging in. Wrong password?");
+            if(err.statusText == "timeout") {
+                alert("Network too slow");
+            } else {
+                alert("Error logging in. Wrong password?");
+            }
         });
-        $.mobile.showPageLoadingMsg();
     });
+
+    // Because doing it immediately makes things block. WTF?
+    setTimeout(function() {
+        if(localStorage.userName && localStorage.password) {
+            setStatus("Logging in");
+            changesets.createChangeset().done(function(id) {
+                currentChangesetID = id;
+                flashStatus("Logged in!", ADD_TEXT);
+            }).fail(function() {
+                setStatus("Login failed");
+            })
+        } else {
+            setStatus("Login to start");
+        }
+    }, 300);
 });
 
 // getBeforeSend - return function that adds basic authentication and fakes request method.
