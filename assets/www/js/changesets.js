@@ -12,7 +12,8 @@ window.changesets = (function() {
             },
             error: function(err) {
                 d.reject(err);
-            }
+            },
+            timeout: 30 * 1000
         });
 
         return d;

@@ -64,16 +64,16 @@
     <div data-role="page" id="map-page">
         <div data-role="header" id="map-header" class="center-wrapper">
             <div class="text">POIOSM</div>
-            <div class="img-btn" id="login"><img src="img/preferences.png" /></div>
+            <div class="img-btn ui-btn-up-a" id="login"><img src="img/preferences.png" /></div>
         </div>
         <div id="map-container" data-role="content">
             <div id="map">
             </div>
         </div>
         <div id="map-footer" data-role="footer">
-                <div class="img-toggle"> <img src="img/refresh.png" id="show-poi" /> </div>
-                <div class="footer-text-container img-btn" id="add-poi">Tap here to create</div>
-                <div class="img-btn"><img  src="img/mylocation.png" id="current-location" /> </div>
+                <div class="img-toggle ui-btn-up-a"> <img src="img/refresh.png" id="show-poi" /> </div>
+                <div class="footer-text-container img-btn ui-btn-up-a" id="tap-bar">Tap here to create</div>
+                <div class="img-btn ui-btn-up-a"><img  src="img/mylocation.png" id="current-location" /> </div>
         </div>
     </div>
 
@@ -94,18 +94,23 @@
             <div class="text" id="poi-name">OSM Login</div>
         </div>
         <div data-role="content" id="login-content">
-            <div data-role="fieldcontain">
-                <label for="login-user-id">Username</label>
-                <input type="text" name="login-user-id" id="login-user-id" />
-            </div>
+            <form>
+                <div data-role="fieldcontain">
+                    <label for="login-user-id">Username</label>
+                    <input type="text" name="login-user-id" id="login-user-id" />
+                </div>
 
-            <div data-role="fieldcontain">
-                <label for="login-user-password">Password</label>
-                <input type="password" name="login-user-password" id="login-password"  />
-            </div>
+                <div data-role="fieldcontain">
+                    <label for="login-user-password">Password</label>
+                    <input type="password" name="login-user-password" id="login-password"  />
+                </div>
+
+                <div data-role="fieldcontain">
+                    <button id="save-login">Login</button>
+                </div>
+            </form>
         </div>
         <div data-role="footer" id="login-footer">
-            <button id="save-login">Save</button>
         </div>
     </div>
 

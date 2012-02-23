@@ -6,12 +6,85 @@ var overpassBaseURL = 'http://overpass.osm.rambler.ru/cgi/interpreter';
 var autoPOI = false;
 var updateLocation = true;
 
-var ADD_TEXT = "Tap to add point";
-
 var newMarkerIconClass = L.Icon.extend({
     iconUrl: "img/new-marker.png",
 });
 var newMarkerIcon = new newMarkerIconClass();
+
+var tapBarActions = {
+    "login-start": {
+        text: "Login",
+        callback: function() {
+            $("#login").click();
+        }
+    },
+    "login-in-progress": {
+        text: "Logging in",
+        disabled: true
+    },
+    "login-failed": {
+        text: "Logged in!",
+        disabled: true,
+        next: 'create-poi-start'
+    },
+    "login-success": {
+        text: "Logged in!",
+        disabled: true,
+        next: 'create-poi-start'
+    },
+    "create-poi-start": {
+        text: "Create POI",
+        callback: function() {
+            console.log("Creating poi");
+            startAdd();
+        }
+    },
+    "create-poi-place": {
+        text: "Tap on location in map",
+        disabled: true
+    },
+    "create-poi-save": {
+        text: "Save location",
+        callback: function() {
+            stopAdd();
+        }
+    },
+    "create-poi-failed": {
+        text: "Creating Failed :(",
+        disabled: true,
+        next: 'create-poi-start'
+    }, 
+    "create-poi-cancelled": {
+        text: "Creating Cancelled",
+        disabled: true,
+        next: 'create-poi-start'
+    }, 
+    "create-poi-creating": {
+        text: "Creating...",
+        disabled: true
+    }, 
+    "create-poi-created": {
+        text: "Created!",
+        disabled: true,
+        next: 'create-poi-start'
+    }
+};
+           
+function setTapBarState(state_name) {
+    var state = tapBarActions[state_name];
+    $("#tap-bar").html(state.text).unbind('vclick').bind('vclick', state.callback);
+    if(state.disabled) {
+        $("#tap-bar").attr("disabled", "disabled").removeClass("img-btn").removeClass("ui-btn-up-a");
+    } else {
+        $("#tap-bar").removeAttr("disabled").addClass("img-btn").addClass("ui-btn-up-a");
+    }
+
+    if(state.next) {
+        setTimeout(function() {
+            setTapBarState(state.next);
+        }, 2 * 1000);
+    }
+}
 
 function onBodyLoad() {
     if(window.PhoneGap.available) {
@@ -66,7 +139,7 @@ function init() {
             if(addMarker === null) {
                  addMarker = new L.Marker(event.latlng, {draggable: true, icon: newMarkerIcon});
                  map.addLayer(addMarker);
-                 setStatus("Tap to save");
+                 setTapBarState("create-poi-save");
             }
         }
     });
@@ -88,41 +161,29 @@ function updatePOIs() {
 var adding = false;
 function startAdd() {
     adding = true;
-    setStatus("Touch location on map");
+    setTapBarState("create-poi-place");
     $("#add-poi").find('img').attr('src', 'img/save.png');
-}
-
-function setStatus(html) {
-    $("#add-poi").html(html);
-}
-
-function flashStatus(flashHtml, thenHtml) {
-
-    $("#add-poi").html(flashHtml);
-    setTimeout(function() {
-        $("#add-poi").html(thenHtml);
-    }, 2 * 1000);
 }
 
 function stopAdd() {
     if(addMarker !== null) {
+        setTapBarState("create-poi-creating");
         var name = prompt("Enter name");
         if(name) {
             var latlng = addMarker.getLatLng();
-            setStatus("Creating...");
             POIManager.createPOI(latlng.lat, latlng.lng, name).then(function() {
                 map.removeLayer(addMarker);
                 addMarker = null;
-                setStatus(ADD_TEXT);
+                setTapBarState("create-poi-created");
             }).fail(function() {
-                flashStatus("Creation failed :(", ADD_TEXT);
                 map.removeLayer(addMarker);
                 addMarker = null;
+                setTapBarState("create-poi-failed");
             });
         } else {
-            flashStatus("Creation cancelled", ADD_TEXT);
             map.removeLayer(addMarker);
             addMarker = null;
+            setTapBarState("create-poi-cancelled");
         }
     }
     adding = false;
@@ -142,26 +203,22 @@ function stopSpinImg(selector) {
 }
 
 $(function() {
-    $("#add-poi").click(function() {
-        if(adding) {
-            stopAdd();
-        } else {
-            startAdd();
-        }
-    });
-
     $(".img-btn").bind('vmousedown', function() {
-        $(this).addClass("ui-bar-e");
+        if(!$(this).attr("disabled")) {
+            $(this).addClass("ui-btn-down-e");
+        }
     }).bind('vmouseup', function() {
-        $(this).removeClass("ui-bar-e");
+        if(!$(this).attr("disabled")) {
+            $(this).removeClass("ui-btn-down-e");
+        }
     });
     $(".img-toggle").click(function() {
         if($(this).attr('pressed')) {
-            $(this).removeClass("ui-bar-e");
+            $(this).removeClass("ui-btn-down-e");
             $(this).removeAttr('pressed');
         } else {
             $(this).attr("pressed", "pressed");
-            $(this).addClass("ui-bar-e");
+            $(this).addClass("ui-btn-down-e");
         }
     });
     $("#show-poi").click(function() {
@@ -191,7 +248,7 @@ $(function() {
             currentChangesetID = id;
             $.mobile.hidePageLoadingMsg();
             history.back();
-            setStatus(ADD_TEXT);
+            setTapBarState("create-poi-start");
         }).fail(function(err) {
             console.log(JSON.stringify(err));
             $.mobile.hidePageLoadingMsg();
@@ -206,15 +263,15 @@ $(function() {
     // Because doing it immediately makes things block. WTF?
     setTimeout(function() {
         if(localStorage.userName && localStorage.password) {
-            setStatus("Logging in");
+            setTapBarState("login-in-progress");
             changesets.createChangeset().done(function(id) {
                 currentChangesetID = id;
-                flashStatus("Logged in!", ADD_TEXT);
+                setTapBarState("login-success");
             }).fail(function() {
-                setStatus("Login failed");
+                setTapBarState("login-failed");
             })
         } else {
-            setStatus("Login to start");
+            setTapBarState("login-start");
         }
     }, 300);
 });
