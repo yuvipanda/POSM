@@ -243,8 +243,8 @@ $(function() {
         changesets.createChangeset().then(function(id) {
             currentChangesetID = id;
             $.mobile.hidePageLoadingMsg();
-            history.back();
             setTapBarState("create-poi-start");
+            history.back();
         }).fail(function(err) {
             console.log(JSON.stringify(err));
             $.mobile.hidePageLoadingMsg();
@@ -254,6 +254,7 @@ $(function() {
                 alert("Error logging in. Wrong password?");
             }
         });
+        return false;
     });
 
     // Because doing it immediately makes things block. WTF?
