@@ -155,10 +155,7 @@ POIManager = (function() {
             url: OSMbaseURL + '/api/0.6/node/create',
             type: 'POST',
             data: poiXml,
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader("X_HTTP_METHOD_OVERRIDE", "PUT");
-                xhr.setRequestHeader("Authorization", "Basic " + btoa(localStorage.userName + ":" + localStorage.password));
-            },
+            beforeSend: makeBeforeSend("PUT"), 
             success: function(id) {
                 retrievePOI(id).then(function(node) {
                     displayPOIMarker(node).then(function(marker, popup) { 

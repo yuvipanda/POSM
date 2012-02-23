@@ -189,11 +189,6 @@ function stopAdd() {
     adding = false;
 }
 
-// Ugly fucking hack
-function setButtonText(button, text) {
-    $(button + " .ui-btn-text").text(text);
-}
-
 function startSpinImg(selector) {
     $(selector).addClass("spinner");
 }
@@ -221,6 +216,7 @@ $(function() {
             $(this).addClass("ui-btn-down-e");
         }
     });
+
     $("#show-poi").click(function() {
         autoPOI = !autoPOI;
         if(autoPOI) {
