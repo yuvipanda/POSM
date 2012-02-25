@@ -9,7 +9,7 @@ POIManager = (function() {
         var nw = bounds.getNorthEast();
         var boundsString = "(" + sw.lat + "," + sw.lng + "," + nw.lat + "," + nw.lng + ")";
         console.log(boundsString);
-        startSpinImg("#show-poi");
+        startSpinning("#show-poi");
         $.ajax({
             url: overpassBaseURL,
             data: {
@@ -36,7 +36,7 @@ POIManager = (function() {
                     }
                     return tags.length != ignored_tags && ($.inArray(id, shownNodeIDs) == -1); 
                 });
-                stopSpinImg("#show-poi");
+                stopSpinning("#show-poi");
                 d.resolve(_.map(pois, function(poi) { POI.fromXml(poi); }));
             },
             error: function(err) {
@@ -66,24 +66,26 @@ POIManager = (function() {
             var k = $.trim($("#new-tag-key").val());
             var v = $.trim($("#new-tag-value").val());
             if(k != "" && v != "") {
-                $('#new-tag-container > h3 .ui-btn-text').text("Adding Tag...");
-                $('#new-tag-container > h3 .ui-icon').addClass("spinner");
                 poi.tags[k] = v;
-                poi.save(currentChangesetID).then(function(ver) {
-                    poi.version = ver;
-                    $("#no-tags-item").hide();
-                    $("#poi-tags-list > li").last().addClass("ui-corner-bottom");
-                    $("#poi-tags-list").append("<li>" + k + ": " + v + "</li>").listview('refresh');
-                    $("#new-tag-key").val("");
-                    $("#new-tag-value").val("");
-                    refreshListAppearance();
-                    $('#new-tag-container > h3 .ui-btn-text').text("Add new tag");
-                    $('#new-tag-container > h3 .ui-icon').removeClass("spinner");
-                });
+                $("#no-tags-item").hide();
+                $("#poi-tags-list > li").last().addClass("ui-corner-bottom");
+                $("#poi-tags-list").append("<li class='unsaved-tag ui-body-e'>" + k + ": " + v + "</li>").listview('refresh');
+                $("#new-tag-key").val("");
+                $("#new-tag-value").val("");
+                $("#save-poi").removeClass("disabled");
+                refreshListAppearance();
             }
             return false;
         });
 
+        $("#save-poi").unbind('vclick').bind('vclick', function() {
+            startSpinning("#save-poi");
+            poi.save(currentChangesetID).then(function(ver) {
+                poi.version = ver;
+                $("#poi-tags-list > li.ui-body-e").removeClass("ui-body-e").addClass("ui-body-c");
+                stopSpinning("#save-poi");
+            });
+        });
     }
 
     function displayPOIMarker(poi) {

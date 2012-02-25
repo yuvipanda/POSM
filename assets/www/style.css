@@ -10,6 +10,9 @@ text-align: center;
 margin: 0 auto;
 }
 
+.disabled {
+    opacity: 0.2;
+}
 
 .hidden {
     display: none;

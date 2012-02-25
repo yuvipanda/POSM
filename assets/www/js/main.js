@@ -189,11 +189,11 @@ function stopAdd() {
     adding = false;
 }
 
-function startSpinImg(selector) {
+function startSpinning(selector) {
     $(selector).addClass("spinner");
 }
 
-function stopSpinImg(selector) {
+function stopSpinning(selector) {
     $(selector).removeClass("spinner");
 }
 
