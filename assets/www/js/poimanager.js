@@ -149,7 +149,6 @@ POIManager = (function() {
             },
             success: function(resp) {
                 var poi = POI.fromXml($(resp).find('node')[0]);
-                displayPOIMarker(poi);
                 d.resolve(poi);
             },
             error: function(err) {
@@ -182,6 +181,7 @@ POIManager = (function() {
                     displayPOIMarker(poi).then(function(marker, popup) { 
                         map.openPopup(popup);
                     });
+                    showPOI(poi);
                 });
                 d.resolve(id);
             },
