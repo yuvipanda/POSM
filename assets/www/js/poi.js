@@ -23,23 +23,19 @@ POIManager = (function() {
                 var pois = $.grep(elements, function(element) {
                     var tags = $(element).find('tag');
                     var id = $(element).attr('id');
+                    var ignored_tags = 0;
                     if(tags.length) {
-                        var to_delete = [];
                         tags.each(function(i, tag) {
                             var key = $(tag).attr('k');
                             var value = $(tag).attr('v');
                             $.each(deleteTags, function(i, regex) {
                                 if(key.match(new RegExp(regex))) {
-                                    to_delete.push(tag);
+                                    ignored_tags += 1;
                                 }
                             });
                         });
-
-                        $.each(to_delete, function(i, tag) {
-                            $(tag).remove();
-                        });
                     }
-                    return $(element).find('tag').length && ($.inArray(id, shownNodeIDs) == -1); 
+                    return tags.length != ignored_tags && ($.inArray(id, shownNodeIDs) == -1); 
                 });
                 stopSpinImg("#show-poi");
                 d.resolve(pois);
@@ -66,23 +62,83 @@ POIManager = (function() {
                 tags.push({'key': key, 'value': value});
             }
         });
-        // Assume that if there's no meta information, user just created this thing :)
         return {
             id: $poi.attr('id'),
             lat: $poi.attr('lat'),
             lon: $poi.attr('lon'),
-            lastUpdate: $.timeago($poi.attr('timestamp') || new Date()),
-            lastUser: $poi.attr('user') || localStorage.userName,
+            lastUpdate: $.timeago($poi.attr('timestamp')),
+            lastUser: $poi.attr('user'),
             name: name,
-            tags: tags
+            tags: tags,
+            source: poi
         };
     }
 
+    function savePOI(id, poi) {
+        var required_attrs = ['id', 'version', 'changeset', 'lat', 'lon'];
+
+        var d = $.Deferred();
+
+        poi.setAttribute("changeset", currentChangesetID);
+
+        var poiXml = (new XMLSerializer()).serializeToString(poi);
+
+        console.log(poiXml);
+        $.ajax({
+            url: OSMbaseURL + '/api/0.6/node/' + id,
+            type: 'POST',
+            data: "<osm>" +  poiXml + "</osm>",
+            beforeSend: makeBeforeSend("PUT"),
+            success: function(resp) {
+                d.resolve(resp);
+            },
+            error: function(err) {
+                console.log("Failed :( " + JSON.stringify(err));
+                d.reject(err);
+            },
+            timeout: 30 * 1000
+        });
+
+        return d;
+    }
     function showPOI(poi) {
         var template = templates.getTemplate("poi-template");
         $("#poi-content").empty().html(template.render(poi));
         $.mobile.changePage('#poi-page');
+        function refreshListAppearance() {
+            $("#poi-tags-list > li").last().removeClass("ui-corner-bottom");
+        }
         $("#poi-page").trigger("create");
+        $("#new-tag-container > h3 > a").removeClass("ui-corner-top").bind('vclick', function() {
+            $(this).toggleClass("ui-corner-bottom");
+        });
+        refreshListAppearance();
+        $("#new-tag-submit").click(function() {
+            var k = $.trim($("#new-tag-key").val());
+            var v = $.trim($("#new-tag-value").val());
+            if(k != "" && v != "") {
+                $('#new-tag-container > h3 .ui-btn-text').text("Adding Tag...");
+                $('#new-tag-container > h3 .ui-icon').addClass("spinner");
+                var xPoi = poi.source;
+                var tag = xPoi.ownerDocument.createElement('tag');
+                tag.setAttribute('k', k);
+                tag.setAttribute('v', v);
+                xPoi.appendChild(tag);
+                savePOI(poi.id, xPoi).then(function(rev) {
+                    xPoi.setAttribute('version', rev);
+                    $("#no-tags-item").hide();
+                    $("#poi-tags-list > li").last().addClass("ui-corner-bottom");
+                    $("#poi-tags-list").append("<li>" + k + ": " + v + "</li>").listview('refresh');
+                    refreshListAppearance();
+                    $("#new-tag-key").val("");
+                    $("#new-tag-value").val("");
+                    $('#new-tag-container > h3 .ui-btn-text').text("Add new tag...");
+                    $('#new-tag-container > h3 .ui-icon').removeClass("spinner");
+                });
+            }
+            return false;
+        });
+
     }
 
     function displayPOIMarker(poi) {
@@ -124,7 +180,7 @@ POIManager = (function() {
                 xhr.setRequestHeader("Authorization", "Basic " + btoa(localStorage.userName + ":" + localStorage.password));
             },
             success: function(resp) {
-                var node = $(resp).find('node');
+                var node = $(resp).find('node')[0];
                 displayPOIMarker(node);
                 d.resolve(node);
             },
@@ -175,6 +231,9 @@ POIManager = (function() {
     return {
         getPOIsInBounds: getPOIsInBounds,
         displayPOIMarkers: displayPOIMarkers,
-        createPOI: createPOI
+        createPOI: createPOI,
+        showPOI: showPOI,
+        retrievePOI: retrievePOI,
+        displayPOIMarker: displayPOIMarker
     };
 })();

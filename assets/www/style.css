@@ -22,7 +22,7 @@ margin: 0 auto;
     -webkit-transform: rotate(360deg);
   }
 }
-img.spinner {
+.spinner {
       -webkit-animation-name: rotate;
       -webkit-animation-duration: 1.5s;
       -webkit-animation-iteration-count: infinite;
@@ -35,6 +35,10 @@ img.spinner {
     -webkit-box-pack: center;
     -webkit-box-align: center;
     height: 38px;
+}
+
+.ui-collapsible-heading {
+    margin: 0px;
 }
 
 .text {
@@ -73,4 +77,12 @@ img.spinner {
 
 .ui-page {
     -webkit-backface-visibility: hidden;
+}
+
+#poi-tags-list {
+    margin-bottom: 0px;
+}
+
+#new-tag-container {
+    margin-top: 0px;
 }

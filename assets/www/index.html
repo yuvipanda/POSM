@@ -50,9 +50,19 @@
             </li>
         {{/tags}}
         {{^tags}}
-            <li>No tags added</li>
+            <li id="no-tags-item">No tags added</li>
         {{/tags}}
         </ul>
+        <div data-role="collapsible" id="new-tag-container" data-mini="true">
+            <h3>Add new tag</h3>
+            <form>
+                <label for="new-tag-key">Key</label>
+                <input type="text" name="new-tag-key" id="new-tag-key" />
+                <label for="new-tag-value">Value</label>
+                <input type="text" name="new-tag-value" id="new-tag-value" />
+                <button id="new-tag-submit">Add Tag</button>
+            </form>
+        </div>
         <div>
             <small>Last updated <strong>{{lastUpdate}}</strong> by <strong>{{lastUser}}</strong></small>
         </div>
