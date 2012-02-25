@@ -1,5 +1,4 @@
 POIManager = (function() {
-    var deleteTags = ['^source$', '^created_by$', '^AND_'];
 
     var shownNodeIDs = [];
 
@@ -38,7 +37,7 @@ POIManager = (function() {
                     return tags.length != ignored_tags && ($.inArray(id, shownNodeIDs) == -1); 
                 });
                 stopSpinImg("#show-poi");
-                d.resolve(pois);
+                d.resolve(_.map(pois, function(poi) { POI.fromXml(poi); }));
             },
             error: function(err) {
                 d.reject(err); 
@@ -48,44 +47,16 @@ POIManager = (function() {
         return d;
     }
     
-    function convertForDisplay(poi) {
-        var tags = [];
-        var name = "Not named";
-        var $poi = $(poi);
-        $poi.find('tag').each(function(i, tag) {
-            $tag = $(tag);
-            var key = $(tag).attr('k');
-            var value = $(tag).attr('v');
-            if(key == 'name') {
-                name = value;
-            } else {
-                tags.push({'key': key, 'value': value});
-            }
-        });
-        return {
-            id: $poi.attr('id'),
-            lat: $poi.attr('lat'),
-            lon: $poi.attr('lon'),
-            lastUpdate: $.timeago($poi.attr('timestamp')),
-            lastUser: $poi.attr('user'),
-            name: name,
-            tags: tags,
-            source: poi
-        };
-    }
-
-    function savePOI(id, poi) {
+    function savePOI(poi) {
         var required_attrs = ['id', 'version', 'changeset', 'lat', 'lon'];
 
         var d = $.Deferred();
 
-        poi.setAttribute("changeset", currentChangesetID);
-
-        var poiXml = (new XMLSerializer()).serializeToString(poi);
+        var poiXml = poi.toXml(currentChangesetID);
 
         console.log(poiXml);
         $.ajax({
-            url: OSMbaseURL + '/api/0.6/node/' + id,
+            url: OSMbaseURL + '/api/0.6/node/' + poi.id,
             type: 'POST',
             data: "<osm>" +  poiXml + "</osm>",
             beforeSend: makeBeforeSend("PUT"),
@@ -102,9 +73,11 @@ POIManager = (function() {
         return d;
     }
     function showPOI(poi) {
-        var template = templates.getTemplate("poi-template");
-        $("#poi-content").empty().html(template.render(poi));
+        var poiTemplate = templates.getTemplate("poi-template");
+        $("#poi-content").empty().html(poiTemplate(poi));
+
         $.mobile.changePage('#poi-page');
+
         function refreshListAppearance() {
             $("#poi-tags-list > li").last().removeClass("ui-corner-bottom");
         }
@@ -113,26 +86,23 @@ POIManager = (function() {
             $(this).toggleClass("ui-corner-bottom");
         });
         refreshListAppearance();
+
         $("#new-tag-submit").click(function() {
             var k = $.trim($("#new-tag-key").val());
             var v = $.trim($("#new-tag-value").val());
             if(k != "" && v != "") {
                 $('#new-tag-container > h3 .ui-btn-text').text("Adding Tag...");
                 $('#new-tag-container > h3 .ui-icon').addClass("spinner");
-                var xPoi = poi.source;
-                var tag = xPoi.ownerDocument.createElement('tag');
-                tag.setAttribute('k', k);
-                tag.setAttribute('v', v);
-                xPoi.appendChild(tag);
-                savePOI(poi.id, xPoi).then(function(rev) {
-                    xPoi.setAttribute('version', rev);
+                poi.tags[k] = v;
+                savePOI(poi).then(function(ver) {
+                    poi.version = ver;
                     $("#no-tags-item").hide();
                     $("#poi-tags-list > li").last().addClass("ui-corner-bottom");
                     $("#poi-tags-list").append("<li>" + k + ": " + v + "</li>").listview('refresh');
-                    refreshListAppearance();
                     $("#new-tag-key").val("");
                     $("#new-tag-value").val("");
-                    $('#new-tag-container > h3 .ui-btn-text').text("Add new tag...");
+                    refreshListAppearance();
+                    $('#new-tag-container > h3 .ui-btn-text').text("Add new tag");
                     $('#new-tag-container > h3 .ui-icon').removeClass("spinner");
                 });
             }
@@ -144,21 +114,19 @@ POIManager = (function() {
     function displayPOIMarker(poi) {
         var d = $.Deferred();
 
-        var poiData = convertForDisplay(poi);
-        var point = new L.LatLng(poiData.lat, poiData.lon);
-        var marker = new L.Marker(point);
+        var marker = new L.Marker(poi.location);
         var popup = new L.Popup({offset: new L.Point(0, -20)}, poi);
-        var popupContent = $("<div><strong>" + poiData.name + "</strong></div>").click(function() {
-            showPOI(poiData);
+        var popupContent = $("<div><strong>" + poi.name + "</strong></div>").click(function() {
+            showPOI(poi);
             map.openPopup(popup);
         })[0];
-        popup.setLatLng(point);
+        popup.setLatLng(poi.location);
         popup.setContent(popupContent);
         marker.on('click', function() {
             map.openPopup(popup);
         });
         map.addLayer(marker);
-        shownNodeIDs.push(poiData.id);
+        shownNodeIDs.push(poi.id);
 
         d.resolve(marker, popup);
         return d;
@@ -180,9 +148,9 @@ POIManager = (function() {
                 xhr.setRequestHeader("Authorization", "Basic " + btoa(localStorage.userName + ":" + localStorage.password));
             },
             success: function(resp) {
-                var node = $(resp).find('node')[0];
-                displayPOIMarker(node);
-                d.resolve(node);
+                var poi = POI.fromXml($(resp).find('node')[0]);
+                displayPOIMarker(poi);
+                d.resolve(poi);
             },
             error: function(err) {
                 console.log('no POI for id ' + id);
@@ -193,28 +161,25 @@ POIManager = (function() {
         return d;
     }
 
-    function createPOI(lat, lon, name) {
+    function createPOI(location, name) {
         var d = $.Deferred();
 
-        var template = templates.getTemplate("node-template");
-        var poiData = {
-            changeset_id: currentChangesetID,
-            lat: lat,
-            lon: lon,
-            tags: [
-                {key: 'name', value: name}
-            ]
-        };
-        var poiXml = template.render(poiData);
-        console.log(poiXml);
+        var poi = new POI({
+            location: location,
+            tags: {
+                name: name
+            }
+        });
+        var poiXml = poi.toXml(currentChangesetID);
+
         $.ajax({
             url: OSMbaseURL + '/api/0.6/node/create',
             type: 'POST',
-            data: poiXml,
+            data: '<osm>' + poiXml + "</osm>",
             beforeSend: makeBeforeSend("PUT"), 
             success: function(id) {
-                retrievePOI(id).then(function(node) {
-                    displayPOIMarker(node).then(function(marker, popup) { 
+                retrievePOI(id).then(function(poi) {
+                    displayPOIMarker(poi).then(function(marker, popup) { 
                         map.openPopup(popup);
                     });
                 });

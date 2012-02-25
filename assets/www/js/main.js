@@ -171,7 +171,7 @@ function stopAdd() {
         var name = prompt("Enter name");
         if(name) {
             var latlng = addMarker.getLatLng();
-            POIManager.createPOI(latlng.lat, latlng.lng, name).then(function() {
+            POIManager.createPOI(latlng, name).then(function() {
                 map.removeLayer(addMarker);
                 addMarker = null;
                 setTapBarState("create-poi-created");

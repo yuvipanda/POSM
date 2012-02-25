@@ -11,7 +11,7 @@
 
 <script src="lib/jquery-1.7.1.min.js"></script>
 <script src="lib/jquery.mobile-1.0.1.js"></script>
-<script src="lib/hogan.min.js"></script>
+<script src="lib/underscore.js"></script>
 <script src="lib/jquery.timeago.js"></script>
 <script src="lib/templates.js"></script>
 
@@ -19,39 +19,42 @@
 
 <link rel="stylesheet" href="style.css" />
 <script src="lib/leaflet/leaflet-src.js"></script>
+<script src="js/poi.js"></script>
 <script src="js/poimanager.js"></script>
 <script src="js/curpos.js"></script>
 <script src="js/changesets.js"></script>
 <script src="js/main.js"></script>
 <script type="text/html" id="node-template">
-    <osm>
-        <node changeset="{{changeset_id}}" lat="{{lat}}" lon="{{lon}}">
-            {{#tags}}
-            <tag k="{{key}}" v="{{value}}" />
-            {{/tags}}
-        </node>
-    </osm>
+    <node <% if(typeof id !== "undefined") { %> id="<%= id %>" <% } %> changeset="<%= changesetId %>" <% if(typeof version !== "undefined") { %>version="<%= version %>" <% } %> lat="<%= location.lat %>" lon="<%= location.lng %>">
+        <% _.each(tags, function(value, key) { %> 
+            <tag k="<%= key %>" v="<%= value %>" />
+        <% }); %>
+    </node>
 </script>
 <script type="text/html" id="poi-template">
     <div>
         <div class="ui-grid-a">
-            <small class="ui-block-a" style="width: 35%">#{{id}}</small>
-            <small class="ui-block-b" style="width: 65%; text-align: right">({{lat}}, {{lon}})</small>
+            <small class="ui-block-a" style="width: 35%"><%= id %></small>
+            <small class="ui-block-b" style="width: 65%; text-align: right">
+                (<%= location.lat %>, <%= location.lng %>)
+            </small>
         </div>
-        {{#name}}
+        <% if(name) { %>
         <div>
-            <big>{{name}}</big>
+            <big><%= name %></big>
         </div>
-        {{/name}}
+        <% } %>
         <ul data-role="listview" data-inset="true" id="poi-tags-list">
-        {{#tags}}
-            <li>
-                {{key}}: {{value}}
-            </li>
-        {{/tags}}
-        {{^tags}}
+        <% if(tags.length != 0) { %>
+            <% _.each(tags, function(value, key) { %> 
+                <li>
+                    <%= key %>:
+                    <%= value  %>
+                </li>
+            <% }); %>
+        <%  } else { %>
             <li id="no-tags-item">No tags added</li>
-        {{/tags}}
+        <%  } %>
         </ul>
         <div data-role="collapsible" id="new-tag-container" data-mini="true">
             <h3>Add new tag</h3>
@@ -64,7 +67,11 @@
             </form>
         </div>
         <div>
-            <small>Last updated <strong>{{lastUpdate}}</strong> by <strong>{{lastUser}}</strong></small>
+            <small>
+                Last updated 
+                <strong><%= $.timeago(timestamp) %></strong> by 
+                <strong><%= user.name %></strong>
+            </small>
         </div>
     </div>
 </script>

@@ -5,7 +5,7 @@ window.templates = function() {
 	function getTemplate(name) {
 		if(!compiled_templates[name]) {
 			var html = $("#" + name).html();
-			compiled_templates[name] = Hogan.compile(html);
+			compiled_templates[name] = _.template(html);
 		}
 		return compiled_templates[name];
 	}
