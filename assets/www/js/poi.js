@@ -14,6 +14,33 @@
                     changesetId: changesetId
                 }, this));
         }
+
+        POI.prototype.save = function(changesetId) {
+
+            var required_attrs = ['id', 'version', 'changeset', 'lat', 'lon'];
+
+            var d = $.Deferred();
+
+            var poiXml = this.toXml(changesetId);
+
+            console.log(poiXml);
+            $.ajax({
+                url: OSMbaseURL + '/api/0.6/node/' + this.id,
+                type: 'POST',
+                data: "<osm>" +  poiXml + "</osm>",
+                beforeSend: makeBeforeSend("PUT"),
+                success: function(resp) {
+                    d.resolve(resp);
+                },
+                error: function(err) {
+                    console.log("Failed :( " + JSON.stringify(err));
+                    d.reject(err);
+                },
+                timeout: 30 * 1000
+            });
+
+            return d;
+        }
     }
 
     POI.fromXml = function(node) {

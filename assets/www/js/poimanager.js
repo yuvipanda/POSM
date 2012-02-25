@@ -47,31 +47,6 @@ POIManager = (function() {
         return d;
     }
     
-    function savePOI(poi) {
-        var required_attrs = ['id', 'version', 'changeset', 'lat', 'lon'];
-
-        var d = $.Deferred();
-
-        var poiXml = poi.toXml(currentChangesetID);
-
-        console.log(poiXml);
-        $.ajax({
-            url: OSMbaseURL + '/api/0.6/node/' + poi.id,
-            type: 'POST',
-            data: "<osm>" +  poiXml + "</osm>",
-            beforeSend: makeBeforeSend("PUT"),
-            success: function(resp) {
-                d.resolve(resp);
-            },
-            error: function(err) {
-                console.log("Failed :( " + JSON.stringify(err));
-                d.reject(err);
-            },
-            timeout: 30 * 1000
-        });
-
-        return d;
-    }
     function showPOI(poi) {
         var poiTemplate = templates.getTemplate("poi-template");
         $("#poi-content").empty().html(poiTemplate(poi));
@@ -94,7 +69,7 @@ POIManager = (function() {
                 $('#new-tag-container > h3 .ui-btn-text').text("Adding Tag...");
                 $('#new-tag-container > h3 .ui-icon').addClass("spinner");
                 poi.tags[k] = v;
-                savePOI(poi).then(function(ver) {
+                poi.save(currentChangesetID).then(function(ver) {
                     poi.version = ver;
                     $("#no-tags-item").hide();
                     $("#poi-tags-list > li").last().addClass("ui-corner-bottom");
