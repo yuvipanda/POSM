@@ -92,6 +92,11 @@ var poiTapBarStates = {
         text: "Saved!",
         disabled: true,
         next: "empty"
+    },
+    "save-failed": {
+        text: "Saving failed :(",
+        disabled: true,
+        next: "save"
     }
 };
 

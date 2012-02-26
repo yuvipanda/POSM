@@ -81,13 +81,13 @@ POIManager = (function() {
 
         // Hacky code for now. Need to figure out best way to maintain 'curPOI' state
         $("#save-poi").unbind('vclick').bind('vclick', function() {
-            startSpinning("#save-poi");
             poiTapBar.setState("saving");
-            poi.save(currentChangesetID).then(function(ver) {
+            poi.save(currentChangesetID).done(function(ver) {
                 poi.version = ver;
                 $("#poi-tags-list > li.ui-body-e").removeClass("ui-body-e").addClass("ui-body-c");
-                stopSpinning("#save-poi");
                 poiTapBar.setState("saved");
+            }).fail(function() {
+                poiTapBar.setState("save-failed");
             });
         });
     }
