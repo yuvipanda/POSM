@@ -1,5 +1,7 @@
 POIManager = (function() {
 
+    var hideTagPatterns = ['^source$', '^created_by$', '^AND_'];
+
     var shownNodeIDs = [];
 
     function getPOIsInBounds(bounds) {
@@ -27,7 +29,7 @@ POIManager = (function() {
                         tags.each(function(i, tag) {
                             var key = $(tag).attr('k');
                             var value = $(tag).attr('v');
-                            $.each(deleteTags, function(i, regex) {
+                            $.each(hideTagPatterns, function(i, regex) {
                                 if(key.match(new RegExp(regex))) {
                                     ignored_tags += 1;
                                 }
@@ -37,7 +39,7 @@ POIManager = (function() {
                     return tags.length != ignored_tags && ($.inArray(id, shownNodeIDs) == -1); 
                 });
                 stopSpinning("#show-poi");
-                d.resolve(_.map(pois, function(poi) { POI.fromXml(poi); }));
+                d.resolve(_.map(pois, function(poi) { return POI.fromXml(poi); }));
             },
             error: function(err) {
                 d.reject(err); 
@@ -94,7 +96,7 @@ POIManager = (function() {
 
     function displayPOIMarker(poi) {
         var d = $.Deferred();
-
+        console.log(poi);
         var marker = new L.Marker(poi.location);
         var popup = new L.Popup({offset: new L.Point(0, -20)}, poi);
         var popupContent = $("<div><strong>" + poi.name + "</strong></div>").click(function() {
