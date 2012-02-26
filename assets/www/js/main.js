@@ -5,13 +5,15 @@ var OSMbaseURL = 'http://api.openstreetmap.org';
 var overpassBaseURL = 'http://overpass.osm.rambler.ru/cgi/interpreter';
 var autoPOI = false;
 var updateLocation = true;
+var mapTapBar = null;
+var poiTapBar = null;
 
 var newMarkerIconClass = L.Icon.extend({
     iconUrl: "img/new-marker.png",
 });
 var newMarkerIcon = new newMarkerIconClass();
 
-var tapBarActions = {
+var mapTapBarStates = {
     "login-start": {
         text: "Login",
         callback: function() {
@@ -69,22 +71,29 @@ var tapBarActions = {
         next: 'create-poi-start'
     }
 };
-           
-function setTapBarState(state_name) {
-    var state = tapBarActions[state_name];
-    $("#tap-bar").html(state.text).unbind('vclick').bind('vclick', state.callback);
-    if(state.disabled) {
-        $("#tap-bar").attr("disabled", "disabled").removeClass("img-btn").removeClass("ui-btn-up-a");
-    } else {
-        $("#tap-bar").removeAttr("disabled").addClass("img-btn").addClass("ui-btn-up-a");
-    }
 
-    if(state.next) {
-        setTimeout(function() {
-            setTapBarState(state.next);
-        }, 2 * 1000);
+var poiTapBarStates = {
+    "empty": {
+        text: "",
+        disabled: true
+    },
+    "save": {
+        text: "Save",
+        callback: function() {
+            // Hacky code for now. Need to figure out best way to maintain 'curPOI' state
+            $("#save-poi").trigger('vclick');
+        }
+    }, 
+    "saving": {
+        text: "Saving...",
+        disabled: true
+    },
+    "saved": {
+        text: "Saved!",
+        disabled: true,
+        next: "empty"
     }
-}
+};
 
 function onBodyLoad() {
     if(window.PhoneGap.available) {
@@ -139,7 +148,7 @@ function init() {
             if(addMarker === null) {
                  addMarker = new L.Marker(event.latlng, {draggable: true, icon: newMarkerIcon});
                  map.addLayer(addMarker);
-                 setTapBarState("create-poi-save");
+                 mapTapBar.setState("create-poi-save");
             }
         }
     });
@@ -161,29 +170,29 @@ function updatePOIs() {
 var adding = false;
 function startAdd() {
     adding = true;
-    setTapBarState("create-poi-place");
+    mapTapBar.setState("create-poi-place");
     $("#add-poi").find('img').attr('src', 'img/save.png');
 }
 
 function stopAdd() {
     if(addMarker !== null) {
-        setTapBarState("create-poi-creating");
+        mapTapBar.setState("create-poi-creating");
         var name = prompt("Enter name");
         if(name) {
             var latlng = addMarker.getLatLng();
             POIManager.createPOI(latlng, name).then(function() {
                 map.removeLayer(addMarker);
                 addMarker = null;
-                setTapBarState("create-poi-created");
+                mapTapBar.setState("create-poi-created");
             }).fail(function() {
                 map.removeLayer(addMarker);
                 addMarker = null;
-                setTapBarState("create-poi-failed");
+                mapTapBar.setState("create-poi-failed");
             });
         } else {
             map.removeLayer(addMarker);
             addMarker = null;
-            setTapBarState("create-poi-cancelled");
+            mapTapBar.setState("create-poi-cancelled");
         }
     }
     adding = false;
@@ -198,6 +207,9 @@ function stopSpinning(selector) {
 }
 
 $(function() {
+    mapTapBar = new TapBar("#map-tap-bar", mapTapBarStates);
+    poiTapBar = new TapBar("#poi-tap-bar", poiTapBarStates);
+    poiTapBar.setState("empty");
     $(".img-btn").bind('vmousedown', function() {
         if(!$(this).attr("disabled")) {
             $(this).addClass("ui-btn-down-e");
@@ -243,7 +255,7 @@ $(function() {
         changesets.createChangeset().then(function(id) {
             currentChangesetID = id;
             $.mobile.hidePageLoadingMsg();
-            setTapBarState("create-poi-start");
+            mapTapBar.setState("create-poi-start");
             history.back();
         }).fail(function(err) {
             console.log(JSON.stringify(err));
@@ -260,15 +272,15 @@ $(function() {
     // Because doing it immediately makes things block. WTF?
     setTimeout(function() {
         if(localStorage.userName && localStorage.password) {
-            setTapBarState("login-in-progress");
+            mapTapBar.setState("login-in-progress");
             changesets.createChangeset().done(function(id) {
                 currentChangesetID = id;
-                setTapBarState("login-success");
+                mapTapBar.setState("login-success");
             }).fail(function() {
-                setTapBarState("login-failed");
+                mapTapBar.setState("login-failed");
             })
         } else {
-            setTapBarState("login-start");
+            mapTapBar.setState("login-start");
         }
     }, 300);
 });

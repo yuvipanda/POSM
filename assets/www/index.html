@@ -14,6 +14,7 @@
 <script src="lib/underscore.js"></script>
 <script src="lib/jquery.timeago.js"></script>
 <script src="lib/templates.js"></script>
+<script src="js/tapbar.js"></script>
 
 <link rel="stylesheet" href="lib/leaflet/leaflet.css" />
 
@@ -89,20 +90,21 @@
         </div>
         <div id="map-footer" data-role="footer">
                 <div class="img-toggle ui-btn-up-a"> <img src="img/refresh.png" id="show-poi" /> </div>
-                <div class="footer-text-container img-btn ui-btn-up-a" id="tap-bar">Tap here to create</div>
+                <div class="footer-text-container img-btn ui-btn-up-a" id="map-tap-bar">Tap here to create</div>
                 <div class="img-btn ui-btn-up-a"><img  src="img/mylocation.png" id="current-location" /> </div>
         </div>
     </div>
 
     <div data-role="page" id="poi-page">
-        <div data-role="header" id="poi-header">
+        <div data-role="header" id="poi-header" data-fixed="true">
             <div class="img-btn"><a href="#" data-rel="back"><img src="img/back.png" /></a></div>
             <div class="text" id="poi-name">POI Details</div>
-            <div class="img-btn ui-btn-up-a"><a href="#"><img src="img/save.png" id="save-poi" class="disabled" /></a></div>
+            <div class="img-btn ui-btn-up-a hidden"><a href="#"><img src="img/save.png" id="save-poi" class="disabled" /></a></div>
         </div>
         <div data-role="content" id="poi-content">
         </div>
-        <div data-role="footer" id="poi-footer">
+        <div id="poi-footer" data-role="footer">
+                <div class="footer-text-container img-btn ui-btn-up-a" id="poi-tap-bar"></div>
         </div>
     </div>
 
