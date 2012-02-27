@@ -65,7 +65,7 @@ POIManager = (function() {
                     if(sure) {
                         $(this).removeClass("to-delete-tag");
                         poi.tags[key] = value;
-                        if($("#poi-tags-list > li.to-delete-tag").length && $("#poi-tags-list > li.unsaved-tag").length) {
+                        if($("#poi-tags-list > li.to-delete-tag").length || $("#poi-tags-list > li.unsaved-tag").length) {
                             poiTapBar.setState("save");
                         } else {
                             poiTapBar.setState("empty");
@@ -74,9 +74,17 @@ POIManager = (function() {
                 } else {
                     var sure = confirm("Delete " + key + "?");
                     if(sure) {
-                        $(this).addClass("to-delete-tag");
+                        if($(this).hasClass("unsaved-tag")) {
+                            $(this).remove();
+                        } else {
+                            $(this).addClass("to-delete-tag");
+                        }
                         delete poi.tags[key];
-                        poiTapBar.setState("save");
+                        if($("#poi-tags-list > li.to-delete-tag").length || $("#poi-tags-list > li.unsaved-tag").length) {
+                            poiTapBar.setState("save");
+                        } else {
+                            poiTapBar.setState("empty");
+                        }
                     }
                 }
             }
@@ -108,8 +116,7 @@ POIManager = (function() {
             if(k != "" && v != "") {
                 poi.tags[k] = v;
                 $("#no-tags-item").hide();
-                $("#poi-tags-list > li").last().addClass("ui-corner-bottom");
-                $("#poi-tags-list").append("<li class='unsaved-tag ui-body-e'>" + k + ": " + v + "</li>").listview('refresh');
+                $("#poi-tags-list").append("<li class='unsaved-tag ui-body-e'><span class='poi-tag-key'>" + k + "</span>: <span class='poi-tag-value'>" + v + "</span></li>").listview('refresh');
                 $("#new-tag-key").val("");
                 $("#new-tag-value").val("");
                 $("#save-poi").removeClass("disabled");
