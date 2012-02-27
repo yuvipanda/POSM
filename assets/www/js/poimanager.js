@@ -88,7 +88,6 @@ POIManager = (function() {
                     }
                 }
             }
-            return false;
         }
         function refreshListAppearance() {
             $("#poi-tags-list > li").last().removeClass("ui-corner-bottom");
