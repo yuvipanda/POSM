@@ -48,9 +48,14 @@
         <ul data-role="listview" data-inset="true" id="poi-tags-list">
         <% if(tags.length != 0) { %>
             <% _.each(tags, function(value, key) { %> 
-                <li>
-                    <%= key %>:
-                    <%= value  %>
+                <li data-key="<%= key %>">
+                    <span class="poi-tag-key">
+                        <%= key %>
+                    </span>
+                        :
+                    <span class="poi-tag-value">
+                        <%= value  %>
+                    </span>
                 </li>
             <% }); %>
         <%  } else { %>

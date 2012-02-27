@@ -57,6 +57,23 @@ POIManager = (function() {
 
         function refreshListAppearance() {
             $("#poi-tags-list > li").last().removeClass("ui-corner-bottom");
+            $("#poi-tags-list > li").unbind('taphold').bind('taphold', function() {
+                console.log('in taphold');
+                if($(this).attr('id') !== 'no-tags-item') {
+                    var key = $(this).attr('data-key');
+                    var sure = confirm("Delete " + key + "?");
+                    if(sure) {
+                        $(this).addClass("to-delete-tag");
+                        delete poi.tags[key];
+                        poiTapBar.setState("save");
+                    }
+                }
+            });
+            $("#poi-tags-list > li").unbind('vmousedown').bind('vmousedown', function() {
+                $(this).addClass("ui-btn-down-c");
+            }).unbind('vmousedown').bind('vmouseup', function() {
+                $(this).removeClass("ui-btn-up-c");
+            });
         }
         $("#poi-page").trigger("create");
         $("#new-tag-container > h3 > a").removeClass("ui-corner-top").bind('vclick', function() {
@@ -81,12 +98,14 @@ POIManager = (function() {
             return false;
         });
 
+
         // Hacky code for now. Need to figure out best way to maintain 'curPOI' state
         $("#save-poi").unbind('vclick').bind('vclick', function() {
             poiTapBar.setState("saving");
             poi.save(currentChangesetID).done(function(ver) {
                 poi.version = ver;
                 $("#poi-tags-list > li.ui-body-e").removeClass("ui-body-e").addClass("ui-body-c");
+                $("#poi-tags-list > li.to-delete-tag").removeClass("to-delete-tag").remove();;
                 poiTapBar.setState("saved");
             }).fail(function() {
                 poiTapBar.setState("save-failed");

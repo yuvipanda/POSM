@@ -89,3 +89,7 @@ margin: 0 auto;
 #new-tag-container {
     margin-top: 0px;
 }
+
+.to-delete-tag {
+    color: Red;
+}
