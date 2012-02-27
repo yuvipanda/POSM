@@ -55,12 +55,23 @@ POIManager = (function() {
 
         $.mobile.changePage('#poi-page');
 
-        function refreshListAppearance() {
-            $("#poi-tags-list > li").last().removeClass("ui-corner-bottom");
-            $("#poi-tags-list > li").unbind('taphold').bind('taphold', function() {
-                console.log('in taphold');
-                if($(this).attr('id') !== 'no-tags-item') {
-                    var key = $(this).attr('data-key');
+        function tapHoldBehavior() {
+            console.log('in taphold');
+            if($(this).attr('id') !== 'no-tags-item') {
+                var key = $(this).find('.poi-tag-key').text().trim();
+                var value = $(this).find('.poi-tag-value').text().trim();
+                if($(this).hasClass("to-delete-tag")) {
+                    var sure = confirm("Undelete " + key + "?");
+                    if(sure) {
+                        $(this).removeClass("to-delete-tag");
+                        poi.tags[key] = value;
+                        if($("#poi-tags-list > li.to-delete-tag").length && $("#poi-tags-list > li.unsaved-tag").length) {
+                            poiTapBar.setState("save");
+                        } else {
+                            poiTapBar.setState("empty");
+                        }
+                    }
+                } else {
                     var sure = confirm("Delete " + key + "?");
                     if(sure) {
                         $(this).addClass("to-delete-tag");
@@ -68,18 +79,28 @@ POIManager = (function() {
                         poiTapBar.setState("save");
                     }
                 }
-            });
-            $("#poi-tags-list > li").unbind('vmousedown').bind('vmousedown', function() {
+            }
+            return false;
+        }
+        function refreshListAppearance() {
+            $("#poi-tags-list > li").last().removeClass("ui-corner-bottom");
+            $("#poi-tags-list > li").last().bind('taphold', tapHoldBehavior).bind('vmousedown', function() {
                 $(this).addClass("ui-btn-down-c");
-            }).unbind('vmousedown').bind('vmouseup', function() {
-                $(this).removeClass("ui-btn-up-c");
+            }).bind('vmouseup', function() {
+                $(this).removeClass("ui-btn-down-c");
             });
         }
         $("#poi-page").trigger("create");
         $("#new-tag-container > h3 > a").removeClass("ui-corner-top").bind('vclick', function() {
             $(this).toggleClass("ui-corner-bottom");
         });
-        refreshListAppearance();
+        $("#poi-tags-list > li").bind('taphold', tapHoldBehavior);
+        $("#poi-tags-list > li").bind('vmousedown', function() {
+            $(this).addClass("ui-btn-down-c");
+        }).bind('vmouseup', function() {
+            $(this).removeClass("ui-btn-down-c");
+        });
+        $("#poi-tags-list > li").last().removeClass("ui-corner-bottom");
 
         $("#new-tag-submit").click(function() {
             var k = $.trim($("#new-tag-key").val());
