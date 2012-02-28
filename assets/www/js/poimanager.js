@@ -134,6 +134,7 @@ POIManager = (function() {
                 $("#poi-tags-list > li.ui-body-e").removeClass("ui-body-e").addClass("ui-body-c");
                 $("#poi-tags-list > li.to-delete-tag").removeClass("to-delete-tag").remove();;
                 poiTapBar.setState("saved");
+                history.back();
             }).fail(function() {
                 poiTapBar.setState("save-failed");
             });
