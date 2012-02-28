@@ -249,7 +249,7 @@ $(function() {
     $("#login").click(function() {
         $("#login-user-id").val(localStorage.userName);
         // Death by electrocution and a thousand hours of using PHP 3
-        $("#login-password").val(localStorage.password);
+        $("#login-user-password").val(localStorage.password);
         $.mobile.changePage("#login-dialog");
     });
 

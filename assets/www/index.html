@@ -6,11 +6,11 @@
 
 <script type="text/javascript" charset="utf-8" src="lib/phonegap.js"></script>
 
-<link rel="stylesheet" href="lib/jquery.mobile-1.0.1.css" />
-<link rel="stylesheet" href="lib/jquery.mobile.structure-1.0.1.css" />
+<link rel="stylesheet" href="lib/jquery-mobile/jquery.mobile.css" />
+<link rel="stylesheet" href="lib/jquery-mobile/jquery.mobile.structure.css" />
 
 <script src="lib/jquery-1.7.1.min.js"></script>
-<script src="lib/jquery.mobile-1.0.1.js"></script>
+<script src="lib/jquery-mobile/jquery.mobile.js"></script>
 <script src="lib/underscore.js"></script>
 <script src="lib/jquery.timeago.js"></script>
 <script src="lib/templates.js"></script>
@@ -85,7 +85,7 @@
 </head>
 <body onLoad="onBodyLoad();">
     <div data-role="page" id="map-page">
-        <div data-role="header" id="map-header" class="center-wrapper">
+        <div data-role="header" id="map-header" class="center-wrapper" data-position="fixed">
             <div class="text">POSM</div>
             <div class="img-btn ui-btn-up-a" id="login"><img src="img/preferences.png" /></div>
         </div>
@@ -93,7 +93,7 @@
             <div id="map">
             </div>
         </div>
-        <div id="map-footer" data-role="footer">
+        <div id="map-footer" data-role="footer" data-position="fixed">
                 <div class="img-toggle ui-btn-up-a"> <img src="img/refresh.png" id="show-poi" /> </div>
                 <div class="footer-text-container img-btn ui-btn-up-a" id="map-tap-bar">Tap here to create</div>
                 <div class="img-btn ui-btn-up-a"><img  src="img/mylocation.png" id="current-location" /> </div>
@@ -101,41 +101,41 @@
     </div>
 
     <div data-role="page" id="poi-page">
-        <div data-role="header" id="poi-header" data-fixed="true">
+        <div data-role="header" id="poi-header" data-position="fixed">
             <div class="img-btn"><a href="#" data-rel="back"><img src="img/back.png" /></a></div>
             <div class="text" id="poi-name">POI Details</div>
             <div class="img-btn ui-btn-up-a hidden"><a href="#"><img src="img/save.png" id="save-poi" class="disabled" /></a></div>
         </div>
         <div data-role="content" id="poi-content">
         </div>
-        <div id="poi-footer" data-role="footer">
+        <div id="poi-footer" data-role="footer" data-position="fixed">
                 <div class="footer-text-container img-btn ui-btn-up-a" id="poi-tap-bar"></div>
         </div>
     </div>
 
     <div data-role="page" id="login-dialog">
-        <div data-role="header" id="login-header">
+        <div data-role="header" id="login-header" data-position="fixed">
             <div class="img-btn"><a href="#" data-rel="back"><img src="img/back.png" /></a></div>
             <div class="text" id="poi-name">OSM Login</div>
         </div>
         <div data-role="content" id="login-content">
-            <form>
-                <div data-role="fieldcontain">
+            <ul data-role="listview" data-inset="true">
+                <li>
                     <label for="login-user-id">Username</label>
                     <input type="text" name="login-user-id" id="login-user-id" />
-                </div>
+                </li>
 
-                <div data-role="fieldcontain">
+                <li>
                     <label for="login-user-password">Password</label>
-                    <input type="password" name="login-user-password" id="login-password"  />
-                </div>
+                    <input type="password" name="login-user-password" id="login-user-password"  />
+                </li>
 
-                <div data-role="fieldcontain">
+                <li>
                     <button id="save-login">Login</button>
-                </div>
-            </form>
+                </li>
+            </ul>
         </div>
-        <div data-role="footer" id="login-footer">
+        <div data-role="footer" id="login-footer" data-position="fixed">
         </div>
     </div>
 
