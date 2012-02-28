@@ -4,18 +4,34 @@ POIManager = (function() {
 
     var shownNodeIDs = [];
 
+    function getTagFilters(zoom_level) {
+        var tags = [];
+        if(zoom_level >= 17) {
+            return [];
+        }
+        for(var i = 1; i <= zoom_level; i++) {
+            tags.push.apply(tags, zoomLevelData[i]);
+        }
+        return tags;
+    }
     function getPOIsInBounds(bounds) {
         var d = $.Deferred();
 
+        var queryTemplate = templates.getTemplate('query-template');
+
         var sw = bounds.getSouthWest();
-        var nw = bounds.getNorthEast();
-        var boundsString = "(" + sw.lat + "," + sw.lng + "," + nw.lat + "," + nw.lng + ")";
-        console.log(boundsString);
+        var ne = bounds.getNorthEast();
+        var query = queryTemplate({
+            ne: ne, 
+            sw: sw,
+            tags: getTagFilters(map.getZoom())
+        });
+        console.log(query);
         startSpinning("#show-poi");
         $.ajax({
             url: overpassBaseURL,
             data: {
-                data: "node" + boundsString + ";out meta;"
+                data: query
             },
             dataType: "text",
             success: function(resp) {

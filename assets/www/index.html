@@ -18,6 +18,8 @@
 
 <link rel="stylesheet" href="lib/leaflet/leaflet.css" />
 
+<script src="zoomData.js"></script>
+
 <link rel="stylesheet" href="style.css" />
 <script src="lib/leaflet/leaflet-src.js"></script>
 <script src="js/poi.js"></script>
@@ -81,7 +83,22 @@
         </div>
     </div>
 </script>
-
+<script type="text/html" id="query-template">
+    <% if(tags.length) { %>
+        (
+        <% _.each(tags, function(tagSets) { %>
+        node(<%= sw.lat %>, <%= sw.lng %>, <%= ne.lat %>, <%= ne.lng %>)
+            <% _.each(tagSets, function(value, key) { %>
+                ["<%= key %>"="<%= value %>"]
+            <% }); %>
+        ;
+        <% }); %>
+        );
+    <% } else { %>
+        node(<%= sw.lat %>, <%= sw.lng %>, <%= ne.lat %>, <%= ne.lng %>);
+    <% } %>
+    out meta;
+</script>
 </head>
 <body onLoad="onBodyLoad();">
     <div data-role="page" id="map-page">
