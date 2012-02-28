@@ -1,9 +1,9 @@
-package in.yuvi.OSMPOI;
+package in.yuvi.POSM;
 
 import android.os.Bundle;
 import com.phonegap.*;
 
-public class OSMPOIActivity extends DroidGap {
+public class POSMActivity extends DroidGap {
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
