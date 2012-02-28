@@ -54,6 +54,8 @@ POIManager = (function() {
         $("#poi-content").empty().html(poiTemplate(poi));
 
         $.mobile.changePage('#poi-page');
+        poiTapBar.setState("empty");
+        var removedTags = {};
 
         function tapHoldBehavior() {
             console.log('in taphold');
@@ -64,7 +66,7 @@ POIManager = (function() {
                     var sure = confirm("Undelete " + key + "?");
                     if(sure) {
                         $(this).removeClass("to-delete-tag");
-                        poi.tags[key] = value;
+                        delete removedTags[key];
                         if($("#poi-tags-list > li.to-delete-tag").length || $("#poi-tags-list > li.unsaved-tag").length) {
                             poiTapBar.setState("save");
                         } else {
@@ -79,7 +81,7 @@ POIManager = (function() {
                         } else {
                             $(this).addClass("to-delete-tag");
                         }
-                        delete poi.tags[key];
+                        removedTags[key] = value;
                         if($("#poi-tags-list > li.to-delete-tag").length || $("#poi-tags-list > li.unsaved-tag").length) {
                             poiTapBar.setState("save");
                         } else {
@@ -128,6 +130,9 @@ POIManager = (function() {
 
         // Hacky code for now. Need to figure out best way to maintain 'curPOI' state
         $("#save-poi").unbind('vclick').bind('vclick', function() {
+            $.each(removedTags, function(key, value) {
+                delete poi[key];
+            });
             poiTapBar.setState("saving");
             poi.save(currentChangesetID).done(function(ver) {
                 poi.version = ver;
