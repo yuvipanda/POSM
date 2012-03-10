@@ -133,7 +133,8 @@ function resizeContentArea() {
   };
 
 function init() {
-    $(window).bind('orientationchange pageshow resize', resizeContentArea);
+    $(window).bind('orientationchange resize', resizeContentArea);
+    $("#map-page").bind('pageshow', resizeContentArea);
     map = new L.Map('map');
 
     var tiles = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
