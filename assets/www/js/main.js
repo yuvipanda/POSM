@@ -120,21 +120,7 @@ document.addEventListener("mobileinit", function() {
     $.mobile.page.prototype.options.backBtnText = "";
 }, true);
 
-function resizeContentArea() {
-    var content, contentHeight, footer, header, viewportHeight;
-    window.scroll(0, 0);
-    header = $(":jqmData(role='header'):visible");
-    footer = $(":jqmData(role='footer'):visible");
-    content = $(":jqmData(role='content'):visible");
-    viewportHeight = $(window).height();
-    contentHeight = viewportHeight - header.outerHeight() - footer.outerHeight();
-    $("article:jqmData(role='content')").first().height(contentHeight);
-    return $("#map").height(contentHeight);
-  };
-
 function init() {
-    $(window).bind('orientationchange resize', resizeContentArea);
-    $("#map-page").bind('pageshow', resizeContentArea);
     map = new L.Map('map');
 
     var tiles = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -148,7 +134,6 @@ function init() {
     map.on('locationfound', function(pos) {
         curPosManager.showPosition(pos.latlng, pos.accuracy);
     });
-    resizeContentArea();
 
     map.on('zoomend', function(ev) {
         if(map.getZoom() >= 3 && !autoPOI) {
