@@ -141,12 +141,21 @@ function init() {
         attribution: 'Tiles Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png">. Map data &copy; 2012 OpenStreetMap contributors'
     });
 
+    map.setView(new L.LatLng(0, 0), 2);
     map.addLayer(tiles);
     map.locateAndSetView(18, {enableHighAccuracy: true});
     map.on('locationfound', function(pos) {
         curPosManager.showPosition(pos.latlng, pos.accuracy);
     });
     resizeContentArea();
+
+    map.on('zoomend', function(ev) {
+        if(map.getZoom() >= 3 && !autoPOI) {
+            $("#show-poi").click();
+        } else if(map.getZoom() < 3 && autoPOI) {
+            $("#show-poi").click();
+        }
+    });
 
     map.on('click', function(event) {
         if(adding) { 
@@ -163,6 +172,7 @@ function init() {
         }
         return true;
     });
+
 }
 
 var addMarker = null;
