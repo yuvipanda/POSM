@@ -5,7 +5,7 @@ window.changesets = (function() {
             url: OSMbaseURL + '/api/0.6/changeset/create',
             type: 'POST',
             // Need a way to properly do this, but bah
-            data: "<osm><changeset><tag k='created_by' v='POIOISM' /><tag k='comment' v='testing' /></changeset></osm>",
+            data: "<osm><changeset><tag k='created_by' v='POIOISM' /><tag k='comment' v='POI edit using POSM editor' /></changeset></osm>",
             beforeSend: makeBeforeSend("PUT"),
             success: function(resp) {
                 d.resolve(resp);
