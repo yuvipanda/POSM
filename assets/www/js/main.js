@@ -118,6 +118,8 @@ function onBodyLoad() {
 
 document.addEventListener("mobileinit", function() {
     $.mobile.page.prototype.options.backBtnText = "";
+    console.log("Ignoring contentenabled stuff");
+    $.mobile.ignoreContentEnabled = true;
 }, true);
 
 function init() {

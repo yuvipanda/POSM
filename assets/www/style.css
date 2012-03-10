@@ -82,6 +82,11 @@ margin: 0 auto;
     color: Red;
 }
 
+#login-container {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+}
+
 #map-page {
     display: -webkit-box;
     -webkit-box-orient: vertical;
@@ -101,3 +106,9 @@ margin: 0 auto;
     margin: 0px;
 }
 
+#login-container > input {
+    display: block;
+    margin: 8px 16px;
+    padding: 5px;
+    font-size: 125%;
+}

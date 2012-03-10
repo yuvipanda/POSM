@@ -8,11 +8,14 @@
 
 <script type="text/javascript" charset="utf-8" src="lib/phonegap.js"></script>
 
-<link rel="stylesheet" href="lib/jquery.mobile-1.0.1.css" />
-<link rel="stylesheet" href="lib/jquery.mobile.structure-1.0.1.css" />
+<link rel="stylesheet" href="lib/jquery.mobile/jquery.mobile-1.1.0-rc.1.css" />
+<link rel="stylesheet" href="lib/jquery.mobile/jquery.mobile.structure-1.1.0-rc.1.css" />
 
 <script src="lib/jquery-1.7.1.min.js"></script>
-<script src="lib/jquery.mobile-1.0.1.js"></script>
+
+<script src="js/mobileinit.js"></script>
+
+<script src="lib/jquery.mobile/jquery.mobile-1.1.0-rc.1.js"></script>
 <script src="lib/underscore.js"></script>
 <script src="lib/jquery.timeago.js"></script>
 <script src="lib/templates.js"></script>
@@ -132,26 +135,18 @@
         </div>
     </div>
 
-    <div data-role="page" id="login-dialog">
+    <div data-role="dialog" id="login-dialog">
         <div data-role="header" id="login-header">
             <div class="img-btn"><a href="#" data-rel="back"><img src="img/back.png" /></a></div>
             <div class="text" id="poi-name">OSM Login</div>
         </div>
         <div data-role="content" id="login-content">
-            <form>
-                <div data-role="fieldcontain">
-                    <label for="login-user-id">Username</label>
-                    <input type="text" name="login-user-id" id="login-user-id" />
-                </div>
-
-                <div data-role="fieldcontain">
-                    <label for="login-user-password">Password</label>
-                    <input type="password" name="login-user-password" id="login-password"  />
-                </div>
-
-                <div data-role="fieldcontain">
-                    <button id="save-login">Login</button>
-                </div>
+            <!-- Need to style this manually, otherwise password field gets fucked up -->
+            <!-- Remove when this 'bug' has been fixed in jQuery Mobile -->
+            <form id="login-container" data-enhance="false">
+                <input type="text" name="login-user-id" id="login-user-id" placeholder="OSM Username" />
+                <input type="password" name="login-user-password" id="login-password" placeholder="OSM Password" />
+                <input type="submit" value="Login" id="save-login" />
             </form>
         </div>
         <div data-role="footer" id="login-footer">
