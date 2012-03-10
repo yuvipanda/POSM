@@ -193,22 +193,25 @@ function stopAdd() {
     if(addMarker !== null) {
         mapTapBar.setState("create-poi-creating");
         var name = prompt("Enter name");
-        if(name) {
-            var latlng = addMarker.getLatLng();
-            POIManager.createPOI(latlng, name).then(function() {
+        if(!name) {
+            var create = confirm("Create nameless tag?");
+            if(!create) {
                 map.removeLayer(addMarker);
                 addMarker = null;
-                mapTapBar.setState("create-poi-created");
-            }).fail(function() {
-                map.removeLayer(addMarker);
-                addMarker = null;
-                mapTapBar.setState("create-poi-failed");
-            });
-        } else {
+                mapTapBar.setState("create-poi-cancelled");
+                return;
+            }
+        }
+        var latlng = addMarker.getLatLng();
+        POIManager.createPOI(latlng, name).then(function() {
             map.removeLayer(addMarker);
             addMarker = null;
-            mapTapBar.setState("create-poi-cancelled");
-        }
+            mapTapBar.setState("create-poi-created");
+        }).fail(function() {
+            map.removeLayer(addMarker);
+            addMarker = null;
+            mapTapBar.setState("create-poi-failed");
+        });
     }
     adding = false;
 }

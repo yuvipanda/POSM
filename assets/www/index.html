@@ -29,9 +29,11 @@
 <script src="js/main.js"></script>
 <script type="text/html" id="node-template">
     <node <% if(typeof id !== "undefined") { %> id="<%= id %>" <% } %> changeset="<%= changesetId %>" <% if(typeof version !== "undefined") { %>version="<%= version %>" <% } %> lat="<%= location.lat %>" lon="<%= location.lng %>">
-        <% _.each(tags, function(value, key) { %> 
-            <tag k="<%= key %>" v="<%= value %>" />
-        <% }); %>
+        <% _.each(tags, function(value, key) {   %>
+            <% if(key.trim() !== "" && value.trim() !== "") { %> 
+                <tag k="<%= key %>" v="<%= value %>" />
+            <% }  %>
+         <% }); %>
     </node>
 </script>
 <script type="text/html" id="poi-template">
