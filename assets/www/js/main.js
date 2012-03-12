@@ -124,8 +124,7 @@ function init() {
     map = new L.Map('map');
 
     var tiles = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        //attribution: 'Map data &copy; 2011 OpenStreetMap contributors'
-        attribution: 'Tiles Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png">. Map data &copy; 2012 OpenStreetMap contributors'
+        attribution: 'Map data &copy; 2012 OpenStreetMap contributors'
     });
 
     map.setView(new L.LatLng(0, 0), 2);
