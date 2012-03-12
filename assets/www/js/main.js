@@ -159,6 +159,13 @@ function init() {
         return true;
     });
 
+    // According to https://groups.google.com/group/leaflet-js/browse_thread/thread/2959ba3af68e537a
+    $("#map-page").bind("pageshow", function() {
+        setTimeout(function() {
+            map.invalidateSize();
+        }, 300);
+    });
+
 }
 
 var addMarker = null;
