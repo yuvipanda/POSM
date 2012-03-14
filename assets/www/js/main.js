@@ -7,6 +7,10 @@ var autoPOI = false;
 var updateLocation = true;
 var mapTapBar = null;
 var poiTapBar = null;
+var bingTiles = null;
+var osmTiles = null;
+
+var bingMode = false;
 
 var newMarkerIconClass = L.Icon.extend({
     iconUrl: "img/new-marker.png",
@@ -123,12 +127,14 @@ document.addEventListener("mobileinit", function() {
 function init() {
     map = new L.Map('map');
 
-    var tiles = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    osmTiles = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: 'Map data &copy; 2012 OpenStreetMap contributors'
     });
 
+    bingTiles = new L.TileLayer.Bing(creds.bing, "Aerial");	
+
     map.setView(new L.LatLng(0, 0), 2);
-    map.addLayer(tiles);
+    map.addLayer(osmTiles);
     map.locateAndSetView(18, {enableHighAccuracy: true});
     map.on('locationfound', function(pos) {
         curPosManager.showPosition(pos.latlng, pos.accuracy);
@@ -248,6 +254,15 @@ $(function() {
 
     $("#current-location").click(function() {
         map.locateAndSetView(map.getZoom(), {enableHighAccuracy: true});
+    });
+
+    $("#bing-layer").click(function() {
+        if(bingMode) {
+            map.removeLayer(bingTiles);
+        } else {
+            map.addLayer(bingTiles);
+        }
+        bingMode = !bingMode;
     });
 
 

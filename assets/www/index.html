@@ -8,6 +8,8 @@
 
 <script type="text/javascript" charset="utf-8" src="lib/phonegap.js"></script>
 
+<script src="creds.js"></script>
+
 <link rel="stylesheet" href="lib/jquery.mobile-1.0.1.css" />
 <link rel="stylesheet" href="lib/jquery.mobile.structure-1.0.1.css" />
 
@@ -24,6 +26,7 @@
 
 <link rel="stylesheet" href="style.css" />
 <script src="lib/leaflet/leaflet-src.js"></script>
+<script src="lib/TileLayer.Bing.js"></script>
 <script src="js/poi.js"></script>
 <script src="js/poimanager.js"></script>
 <script src="js/curpos.js"></script>
@@ -106,6 +109,7 @@
     <div data-role="page" id="map-page">
         <div data-role="header" id="map-header" class="center-wrapper">
             <div class="text">POSM</div>
+            <div class="img-toggle ui-btn-up-a" id="bing-layer"><img src="img/mapmode.png" /></div>
             <div class="img-btn ui-btn-up-a" id="login"><img src="img/preferences.png" /></div>
         </div>
         <div id="map-container" data-role="content">
